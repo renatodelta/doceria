@@ -446,7 +446,23 @@ document.addEventListener('DOMContentLoaded', () => {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
-        .then((reg) => console.log('Service Worker do Motoboy registrado com sucesso no escopo:', reg.scope))
+        .then((reg) => {
+          console.log('Service Worker do Motoboy registrado com sucesso no escopo:', reg.scope);
+          
+          // Forçar a verificação de atualizações no servidor ao abrir o app
+          reg.update();
+
+          // Se encontrar uma nova versão instalada no background, recarrega a página na hora
+          reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('Nova versão do Motoboy encontrada! Atualizando aplicativo...');
+                window.location.reload();
+              }
+            });
+          });
+        })
         .catch((err) => console.error('Erro ao registrar Service Worker do Motoboy:', err));
     });
   }
