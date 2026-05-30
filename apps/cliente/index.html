@@ -171,9 +171,27 @@
             </div>
           </div>
 
-          <div class="form-group hidden" id="address-container">
-            <label for="input-address">Endereço de Entrega</label>
-            <input id="input-address" placeholder="Rua, número, bairro" type="text" />
+          <div class="form-group hidden" id="address-container" style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; gap: 10px;">
+              <div class="form-group" style="flex: 2;">
+                <label for="input-address-street">Rua</label>
+                <input id="input-address-street" placeholder="Rua / Avenida" type="text" />
+              </div>
+              <div class="form-group" style="flex: 1;">
+                <label for="input-address-number">Número</label>
+                <input id="input-address-number" placeholder="Nº" type="text" />
+              </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <div class="form-group" style="flex: 1;">
+                <label for="input-address-neighborhood">Bairro</label>
+                <input id="input-address-neighborhood" placeholder="Bairro" type="text" />
+              </div>
+              <div class="form-group" style="flex: 1;">
+                <label for="input-address-complement">Complemento (opcional)</label>
+                <input id="input-address-complement" placeholder="Apto, Bloco..." type="text" />
+              </div>
+            </div>
           </div>
 
           <div class="form-group">

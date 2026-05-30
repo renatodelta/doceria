@@ -17,39 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const categories = [
-    { id: 'paes', name: '🥖 Pães Artesanais' },
     { id: 'bolos', name: '🍰 Bolos Caseiros' }
   ];
 
   // --- MOCK PRODUCT DATABASE ---
   const originalProducts = [
-    {
-      id: 1,
-      category: 'paes',
-      name: 'Sourdough Tradicional',
-      desc: 'Pão de fermentação natural de 24h, casca crocante rústica e miolo extremamente aerado.',
-      price: 24.90,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDURZ5ewq1HLTSRYLo3mJhmQB8cCH8vrEIJRKnpfvkyK6NbtMo6p7dfxElzAFF3_hVbnfzbZv1SaqDQ_Ch_01HDsIiT730wit9m7N9jNYP1dXVnZ0wOYg-9jhV-loh62hP6lXaAuahY_yPmZaB2oAhBJz3NP6KnA0SonsANaV-DfbkffTG6vPull_2690Mj5OHLG50W_yOYXPY4DcWKOZF6kUyPzWdY2V6OxcY6P4bI0j6FZYdy4gCKijV4-JEG0Xs6_11wHUWM_64I',
-      stock: null
-    },
-    {
-      id: 2,
-      category: 'paes',
-      name: 'Croissant Amanteigado',
-      desc: 'Massa folhada tradicional francesa preparada com manteiga nobre extrafina.',
-      price: 12.50,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCubvmWz31qf2V3sGfp3ao8B-sJHNYGqDJ8eTOAipNj2tF0cayZY0lhzsiJFaAuo7Z0bUa6I4oQ-1Pfd7xkXejS19GcaWKQixrzUHji2pSu-ElKOSUK25sUAkaCKEmXZ5P5bfCblcuCip95Nadi5R5ShPFuqs42D2RySzbEoQAtQjN5w4Yz-7Dc3JGZc6iCVIB2C3bzK97pi7CpTJWc9lDPdV0ehc0136PUKp4ZzwkhPKwWQc6B20Wy1m-uBfFJ4Y1b4HbOOuUKLlav',
-      stock: null
-    },
-    {
-      id: 3,
-      category: 'paes',
-      name: 'Pão de Sal (Francês)',
-      desc: 'O pãozinho crocante tradicional queridinho do brasileiro, quentinho e fresco.',
-      price: 0.90,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAmhZiYZkOBjp1S6MiWq3cFQePrGtPJ8Ezy7fDuhpeE_13S-DWHXtXQU0Z65mW32HATCXQtSFh7bmy6CgyXaCa4DH1XDDgFaUNddk8woNevd50j-Ezy3WHYw5pku5vWO8TMrpsiqNb_iBpCYii0zsedn2vnpJ7AfzByHxsgPvU6biTVlRgFRRUmHUDrKkMTaGrF1XzGcwkHo-br4bbwxBTpui_E4ywjof7I_vFqSMyLhuC0Bs0MbEaJziznAu9hrRcOz1G1zAo20UOg',
-      stock: null
-    },
     {
       id: 4,
       category: 'bolos',
@@ -203,7 +175,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const radioDelivery = document.getElementById('radio-delivery');
   const radioPickup = document.getElementById('radio-pickup');
   const addressContainer = document.getElementById('address-container');
-  const inputAddress = document.getElementById('input-address');
+  const inputAddressStreet = document.getElementById('input-address-street');
+  const inputAddressNumber = document.getElementById('input-address-number');
+  const inputAddressNeighborhood = document.getElementById('input-address-neighborhood');
+  const inputAddressComplement = document.getElementById('input-address-complement');
 
   // Mobile elements
   const floatingCartBtn = document.getElementById('floating-cart');
@@ -501,11 +476,18 @@ document.addEventListener('DOMContentLoaded', () => {
   function toggleAddress() {
     if (deliveryMethod === 'retirada') {
       addressContainer.classList.add('hidden');
-      inputAddress.required = false;
-      inputAddress.value = '';
+      inputAddressStreet.required = false;
+      inputAddressNumber.required = false;
+      inputAddressNeighborhood.required = false;
+      inputAddressStreet.value = '';
+      inputAddressNumber.value = '';
+      inputAddressNeighborhood.value = '';
+      inputAddressComplement.value = '';
     } else {
       addressContainer.classList.remove('hidden');
-      inputAddress.required = true;
+      inputAddressStreet.required = true;
+      inputAddressNumber.required = true;
+      inputAddressNeighborhood.required = true;
     }
     calculateTotals();
   }
@@ -566,7 +548,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const name = document.getElementById('input-name').value.trim();
     const phone = document.getElementById('input-phone').value.trim();
-    const address = deliveryMethod === 'delivery' ? inputAddress.value.trim() : 'Retirada na Padaria';
+    let address = 'Retirada na Padaria';
+    if (deliveryMethod === 'delivery') {
+      const street = inputAddressStreet.value.trim();
+      const number = inputAddressNumber.value.trim();
+      const neighborhood = inputAddressNeighborhood.value.trim();
+      const complement = inputAddressComplement.value.trim();
+
+      if (!street || !number || !neighborhood) {
+        alert("Por favor, preencha todos os campos obrigatórios do endereço de entrega!");
+        return;
+      }
+
+      address = `${street}, nº ${number}, Bairro: ${neighborhood}`;
+      if (complement) {
+        address += ` (${complement})`;
+      }
+    }
     const payment = document.getElementById('input-payment').value;
     const notes = document.getElementById('input-notes').value.trim();
 
@@ -577,11 +575,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!phone) {
       alert("Por favor, preencha seu telefone!");
-      return;
-    }
-
-    if (deliveryMethod === 'delivery' && !address) {
-      alert("Por favor, preencha o endereço de entrega!");
       return;
     }
 
