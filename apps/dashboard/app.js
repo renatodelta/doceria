@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let searchQuery = '';
   let activeView = 'orders'; // 'orders', 'products', 'stock', 'motoboys'
   let soundEnabled = localStorage.getItem('dashboard_sound_alerts') !== 'disabled';
+  let soundInterval = null;
 
   // --- UI ELEMENTS ---
   const listPending = document.getElementById('list-pending');
@@ -420,6 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- STAGE ADVANCE LOGIC ---
   async function advanceStage(orderId) {
+    stopNewOrderAlert();
     const order = orders.find(o => o.id === orderId);
     if (!order) return;
 
@@ -449,6 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- DRAWER SLIDE-OVER ---
   function openDrawer(orderId) {
+    stopNewOrderAlert();
     selectedOrder = orders.find(o => o.id === orderId);
     if (!selectedOrder) return;
 
@@ -1163,42 +1166,66 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', unlockAudio);
   document.addEventListener('touchstart', unlockAudio);
 
-  function playTone(ctx, freq, startTime, duration, volume) {
-    const osc1 = ctx.createOscillator();
-    const osc2 = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-    
-    osc1.type = 'sine';
-    osc1.frequency.setValueAtTime(freq, startTime);
-    
-    osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(freq * 2, startTime);
-    
-    gainNode.gain.setValueAtTime(0, startTime);
-    gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.05);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-    
-    osc1.connect(gainNode);
-    osc2.connect(gainNode);
-    gainNode.connect(ctx.destination);
-    
-    osc1.start(startTime);
-    osc2.start(startTime);
-    osc1.stop(startTime + duration + 0.1);
-    osc2.stop(startTime + duration + 0.1);
-  }
-
   function playNewOrderSound() {
     if (!soundEnabled) return;
+    
+    stopNewOrderAlert();
+    
     try {
       const ctx = getAudioContext();
-      const now = ctx.currentTime;
       
-      // Beautiful harmonic chime: C5 (523.25 Hz) then E5 (659.25 Hz)
-      playTone(ctx, 523.25, now, 0.8, 0.2);
-      playTone(ctx, 659.25, now + 0.25, 1.0, 0.2);
+      let ringCount = 0;
+      const maxRings = 10; // 10 rings spaced by 3 seconds = 30 seconds
+      
+      const ring = () => {
+        if (!soundEnabled || ringCount >= maxRings) {
+          stopNewOrderAlert();
+          return;
+        }
+        
+        const now = ctx.currentTime;
+        // High-pitched metallic desk counter bell ("Ting!")
+        const freqs = [1500, 2200, 3000, 3700];
+        const gains = [0.15, 0.08, 0.05, 0.03];
+        
+        freqs.forEach((freq, index) => {
+          const osc = ctx.createOscillator();
+          const gainNode = ctx.createGain();
+          
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+          
+          gainNode.gain.setValueAtTime(0, now);
+          // Sharp attack
+          gainNode.gain.linearRampToValueAtTime(gains[index], now + 0.002);
+          // Rapid initial decay, then long ringing tail
+          gainNode.gain.exponentialRampToValueAtTime(gains[index] * 0.1, now + 0.08);
+          gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+          
+          osc.connect(gainNode);
+          gainNode.connect(ctx.destination);
+          
+          osc.start(now);
+          osc.stop(now + 1.3);
+        });
+        
+        ringCount++;
+      };
+      
+      // Play immediately
+      ring();
+      
+      // Repeat every 3 seconds
+      soundInterval = setInterval(ring, 3000);
     } catch (e) {
       console.warn("Failed to play audio alert:", e);
+    }
+  }
+
+  function stopNewOrderAlert() {
+    if (soundInterval) {
+      clearInterval(soundInterval);
+      soundInterval = null;
     }
   }
 
@@ -1228,6 +1255,8 @@ document.addEventListener('DOMContentLoaded', () => {
       updateSoundButtonUI();
       if (soundEnabled) {
         playNewOrderSound();
+      } else {
+        stopNewOrderAlert();
       }
     };
   }
