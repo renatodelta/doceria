@@ -54,8 +54,10 @@
     <div class="header-overlay"></div>
     <div class="header-content">
       <!-- Store logo with hover animation -->
-      <img src="logo-moeda2.png" alt="Padaria Lamim Logo" class="store-logo"
-        onerror="this.style.display='none'" />
+      <div class="store-logo-container">
+        <img src="logo-moeda2.png" alt="Padaria Lamim Logo" class="store-logo"
+          onerror="this.parentElement.style.display='none'" />
+      </div>
 
       <p class="store-subtitle">Sabor de casa em cada fatia</p>
 
