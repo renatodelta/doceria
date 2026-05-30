@@ -289,18 +289,33 @@ document.addEventListener('DOMContentLoaded', () => {
           </button>
         `;
       } else if (order.status === 'pronto') {
-        const assignedDriver = order.motoboy ? `${order.motoboy}` : 'Nenhum entregador';
-        nextButtonHTML = `
-          <div class="space-y-2">
-            <div class="flex items-center gap-2 text-xs text-on-surface-variant bg-surface-container-high/50 px-3 py-1.5 rounded-lg border border-outline-variant/10">
-              <span class="material-symbols-outlined text-sm">delivery_dining</span>
-              <span class="font-semibold">${assignedDriver}</span>
+        const isPickup = order.clientAddress === 'Retirada na Padaria';
+        if (isPickup) {
+          nextButtonHTML = `
+            <div class="space-y-2">
+              <div class="flex items-center gap-2 text-xs text-on-surface-variant bg-surface-container-high/50 px-3 py-1.5 rounded-lg border border-outline-variant/10">
+                <span class="material-symbols-outlined text-sm">storefront</span>
+                <span class="font-semibold">Retirada na Loja</span>
+              </div>
+              <button class="w-full py-2 bg-success text-on-primary rounded-lg font-bold text-xs hover:brightness-105 transition-all flex items-center justify-center gap-2 btn-finalize-pickup select-none" data-id="${order.id}">
+                Finalizar Retirada
+              </button>
             </div>
-            <button class="w-full py-2 border border-secondary text-secondary rounded-lg font-bold text-xs hover:bg-secondary/5 transition-all flex items-center justify-center gap-2 btn-open-drawer select-none" data-id="${order.id}">
-              Despachar Pedido
-            </button>
-          </div>
-        `;
+          `;
+        } else {
+          const assignedDriver = order.motoboy ? `${order.motoboy}` : 'Nenhum entregador';
+          nextButtonHTML = `
+            <div class="space-y-2">
+              <div class="flex items-center gap-2 text-xs text-on-surface-variant bg-surface-container-high/50 px-3 py-1.5 rounded-lg border border-outline-variant/10">
+                <span class="material-symbols-outlined text-sm">delivery_dining</span>
+                <span class="font-semibold">${assignedDriver}</span>
+              </div>
+              <button class="w-full py-2 border border-secondary text-secondary rounded-lg font-bold text-xs hover:bg-secondary/5 transition-all flex items-center justify-center gap-2 btn-open-drawer select-none" data-id="${order.id}">
+                Despachar Pedido
+              </button>
+            </div>
+          `;
+        }
       }
 
       card.innerHTML = `
@@ -376,6 +391,29 @@ document.addEventListener('DOMContentLoaded', () => {
         e.stopPropagation();
         const id = parseInt(btn.getAttribute('data-id'));
         openDrawer(id);
+      };
+    });
+
+    document.querySelectorAll('.btn-finalize-pickup').forEach(btn => {
+      btn.onclick = async (e) => {
+        e.stopPropagation();
+        const id = parseInt(btn.getAttribute('data-id'));
+        if (confirm(`Deseja realmente finalizar a retirada do Pedido #${id}?`)) {
+          try {
+            const { error } = await supabaseClient
+              .from('pedidos')
+              .update({
+                status: 'entregue',
+                delivered_time: new Date().toISOString()
+              })
+              .eq('id', id);
+
+            if (error) throw error;
+            await loadDashboardData();
+          } catch (err) {
+            console.error("Erro ao finalizar retirada no Supabase:", err);
+          }
+        }
       };
     });
   }
@@ -461,7 +499,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }[selectedOrder.paymentMethod] || selectedOrder.paymentMethod || 'Não informado';
     drawerPaymentMethod.textContent = paymentText;
 
-    if (selectedOrder.status === 'pronto') {
+    const isPickup = selectedOrder.clientAddress === 'Retirada na Padaria';
+    if (selectedOrder.status === 'pronto' && !isPickup) {
       drawerMotoboyAssignPanel.classList.remove('hidden');
       selectMotoboy.value = selectedOrder.motoboy || '';
     } else {
@@ -533,33 +572,57 @@ document.addEventListener('DOMContentLoaded', () => {
       drawerActionsContainer.appendChild(btnPrimary);
     }
     else if (selectedOrder.status === 'pronto') {
-      btnPrimary.classList.add('bg-primary', 'hover:brightness-105');
-      btnPrimary.innerHTML = '<span>Enviar pedido</span><span class="material-symbols-outlined text-sm">local_shipping</span>';
-      btnPrimary.onclick = async () => {
-        const driver = selectMotoboy.value;
-        if (!driver) {
-          alert('Selecione um motoboy disponível para levar a entrega!');
-          return;
-        }
+      const isPickup = selectedOrder.clientAddress === 'Retirada na Padaria';
+      if (isPickup) {
+        btnPrimary.classList.add('bg-success', 'hover:brightness-105');
+        btnPrimary.innerHTML = '<span>Finalizar Retirada</span><span class="material-symbols-outlined text-sm">done_all</span>';
+        btnPrimary.onclick = async () => {
+          try {
+            const { error } = await supabaseClient
+              .from('pedidos')
+              .update({
+                status: 'entregue',
+                delivered_time: new Date().toISOString()
+              })
+              .eq('id', selectedOrder.id);
 
-        try {
-          const { error } = await supabaseClient
-            .from('pedidos')
-            .update({
-              status: 'a_caminho',
-              motoboy: driver,
-              dispatched_time: new Date().toISOString()
-            })
-            .eq('id', selectedOrder.id);
+            if (error) throw error;
+            await loadDashboardData();
+            closeDrawer();
+            alert(`Pedido #${selectedOrder.id} finalizado e entregue na loja!`);
+          } catch (err) {
+            console.error("Erro ao finalizar retirada no Supabase:", err);
+          }
+        };
+      } else {
+        btnPrimary.classList.add('bg-primary', 'hover:brightness-105');
+        btnPrimary.innerHTML = '<span>Enviar pedido</span><span class="material-symbols-outlined text-sm">local_shipping</span>';
+        btnPrimary.onclick = async () => {
+          const driver = selectMotoboy.value;
+          if (!driver) {
+            alert('Selecione um motoboy disponível para levar a entrega!');
+            return;
+          }
 
-          if (error) throw error;
-          await loadDashboardData();
-          closeDrawer();
-          alert(`Pedido #${selectedOrder.id} enviado para o motoboy ${driver}!`);
-        } catch (err) {
-          console.error("Erro ao despachar pedido no Supabase:", err);
-        }
-      };
+          try {
+            const { error } = await supabaseClient
+              .from('pedidos')
+              .update({
+                status: 'a_caminho',
+                motoboy: driver,
+                dispatched_time: new Date().toISOString()
+              })
+              .eq('id', selectedOrder.id);
+
+            if (error) throw error;
+            await loadDashboardData();
+            closeDrawer();
+            alert(`Pedido #${selectedOrder.id} enviado para o motoboy ${driver}!`);
+          } catch (err) {
+            console.error("Erro ao despachar pedido no Supabase:", err);
+          }
+        };
+      }
       drawerActionsContainer.appendChild(btnPrimary);
     }
   }
@@ -1076,6 +1139,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     return audioCtx;
   }
+
+  // Pre-initialize and resume AudioContext on first user interaction to bypass autoplay block
+  const unlockAudio = () => {
+    try {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume().then(() => {
+          console.log("AudioContext unlocked and running!");
+        });
+      }
+      // Remove listeners once unlocked
+      document.removeEventListener('click', unlockAudio);
+      document.removeEventListener('keydown', unlockAudio);
+      document.removeEventListener('touchstart', unlockAudio);
+    } catch (e) {
+      console.warn("Failed to unlock AudioContext:", e);
+    }
+  };
+  document.addEventListener('click', unlockAudio);
+  document.addEventListener('keydown', unlockAudio);
+  document.addEventListener('touchstart', unlockAudio);
 
   function playTone(ctx, freq, startTime, duration, volume) {
     const osc1 = ctx.createOscillator();
