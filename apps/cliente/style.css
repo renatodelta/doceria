@@ -89,23 +89,7 @@ h1, h2, h3, .font-serif {
     pointer-events: none;
 }
 
-/* Orgânico Dripping Chocolate/Caramel Border Effect */
-.store-header::after {
-    content: "";
-    position: absolute;
-    bottom: -30px;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    background-image:
-        radial-gradient(circle at 10% 0%, var(--primary) 30px, transparent 31px),
-        radial-gradient(circle at 25% 0%, var(--primary) 40px, transparent 41px),
-        radial-gradient(circle at 45% 0%, var(--primary) 28px, transparent 29px),
-        radial-gradient(circle at 65% 0%, var(--primary) 45px, transparent 46px),
-        radial-gradient(circle at 85% 0%, var(--primary) 32px, transparent 33px);
-    background-size: 100% 100%;
-    z-index: 1;
-}
+
 
 .header-content {
     position: relative;
