@@ -3,6 +3,18 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // --- HELPER TO FORMAT IMAGE URLS ---
+  function formatImageUrl(url) {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+      return url;
+    }
+    if (window.location.hostname.endsWith('padarialamim.com')) {
+      return 'https://padarialamim.com/' + url;
+    }
+    return '../cliente/' + url;
+  }
+
   // --- STATE ---
   let orders = [];
   let products = [];
@@ -752,7 +764,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       card.innerHTML = `
         <div class="relative aspect-video bg-surface-dim overflow-hidden border-b border-outline-variant/10">
-          <img src="${prod.image}" alt="${prod.name}" class="w-full h-full object-cover" />
+          <img src="${formatImageUrl(prod.image)}" alt="${prod.name}" class="w-full h-full object-cover" />
           <span class="absolute top-3 left-3 ${categoryColor} px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">${categoryLabel}</span>
         </div>
         <div class="p-5 flex-grow flex flex-col justify-between gap-4">
@@ -930,7 +942,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       tr.innerHTML = `
         <td class="py-4 px-4 flex items-center gap-3">
-          <img src="${prod.image}" alt="${prod.name}" class="w-10 h-10 object-cover rounded-lg border border-outline-variant/10 flex-shrink-0" />
+          <img src="${formatImageUrl(prod.image)}" alt="${prod.name}" class="w-10 h-10 object-cover rounded-lg border border-outline-variant/10 flex-shrink-0" />
           <span class="font-semibold text-on-surface">${prod.name}</span>
         </td>
         <td class="py-4 px-4 text-on-surface-variant">${categoryLabel}</td>

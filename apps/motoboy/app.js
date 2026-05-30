@@ -3,6 +3,18 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // --- HELPER TO FORMAT IMAGE URLS ---
+  function formatImageUrl(url) {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+      return url;
+    }
+    if (window.location.hostname.endsWith('padarialamim.com')) {
+      return 'https://padarialamim.com/' + url;
+    }
+    return '../cliente/' + url;
+  }
+
   // --- CONFIGURATION ---
   let currentRider = '';
   let isOnline = true;
@@ -267,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const itemsListHTML = order.items.map(item => `
         <div class="flex items-center gap-4">
           <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-surface-dim">
-            <img alt="${item.name}" class="w-full h-full object-cover" src="${item.image || item.img || ''}"/>
+            <img alt="${item.name}" class="w-full h-full object-cover" src="${formatImageUrl(item.image || item.img)}"/>
           </div>
           <div class="flex-grow">
             <p class="font-bold text-sm text-on-surface">${item.qty}x ${item.name}</p>
