@@ -1156,101 +1156,165 @@ document.addEventListener('DOMContentLoaded', () => {
   btnCloseDrawer.onclick = closeDrawer;
   drawerOverlay.onclick = closeDrawer;
 
-  // --- SOUND ALERTS (WEB AUDIO API) ---
-  let audioCtx = null;
-  function getAudioContext() {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  // --- SOUND ALERTS (HTML5 AUDIO & OFFLINE AUDIO SYNTHESIS) ---
+  let notificationAudio = null;
+
+  function bufferToWav(buffer) {
+    const numOfChan = buffer.numberOfChannels;
+    const length = buffer.length * 2 + 44;
+    const bufferArr = new ArrayBuffer(length);
+    const view = new DataView(bufferArr);
+    const channels = [];
+    let i;
+    let sample;
+    let pos = 0;
+    let offset = 0;
+
+    const setUint16 = (data) => {
+      view.setUint16(pos, data, true);
+      pos += 2;
+    };
+
+    const setUint32 = (data) => {
+      view.setUint32(pos, data, true);
+      pos += 4;
+    };
+
+    // Write WAV header
+    setUint32(0x46464952); // "RIFF"
+    setUint32(length - 8); // file length - 8
+    setUint32(0x45564157); // "WAVE"
+    setUint32(0x20746d66); // "fmt " chunk
+    setUint32(16);         // chunk length
+    setUint16(1);          // sample format (raw)
+    setUint16(numOfChan);  // channel count
+    setUint32(buffer.sampleRate); // sample rate
+    setUint32(buffer.sampleRate * 2 * numOfChan); // byte rate
+    setUint16(numOfChan * 2); // block align
+    setUint16(16);         // bits per sample
+    setUint32(0x61746164); // "data" chunk
+    setUint32(length - pos - 4); // chunk length
+
+    for (i = 0; i < buffer.numberOfChannels; i++) {
+      channels.push(buffer.getChannelData(i));
     }
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
+
+    while (pos < length) {
+      for (i = 0; i < numOfChan; i++) {
+        sample = Math.max(-1, Math.min(1, channels[i][offset]));
+        sample = (sample < 0 ? sample * 0x8000 : sample * 0x7FFF);
+        view.setInt16(pos, sample, true);
+        pos += 2;
+      }
+      offset++;
     }
-    return audioCtx;
+
+    return new Blob([bufferArr], { type: 'audio/wav' });
   }
 
-  // Pre-initialize and resume AudioContext on first user interaction to bypass autoplay block
-  const unlockAudio = () => {
+  async function initNotificationAudio() {
     try {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume().then(() => {
-          console.log("AudioContext unlocked and running!");
-        });
-      }
-      // Remove listeners once unlocked
-      document.removeEventListener('click', unlockAudio);
-      document.removeEventListener('keydown', unlockAudio);
-      document.removeEventListener('touchstart', unlockAudio);
+      const sampleRate = 44100;
+      const duration = 1.5;
+      const offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, sampleRate * duration, sampleRate);
+      
+      const now = 0;
+      // High-pitched metallic desk counter bell ("Ting!")
+      const freqs = [1500, 2200, 3000, 3700];
+      const gains = [0.15, 0.08, 0.05, 0.03];
+      
+      freqs.forEach((freq, index) => {
+        const osc = offlineCtx.createOscillator();
+        const gainNode = offlineCtx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        
+        gainNode.gain.setValueAtTime(0, now);
+        gainNode.gain.linearRampToValueAtTime(gains[index], now + 0.002);
+        gainNode.gain.exponentialRampToValueAtTime(gains[index] * 0.1, now + 0.08);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+        
+        osc.connect(gainNode);
+        gainNode.connect(offlineCtx.destination);
+        
+        osc.start(now);
+        osc.stop(now + 1.3);
+      });
+      
+      const renderedBuffer = await offlineCtx.startRendering();
+      const wavBlob = bufferToWav(renderedBuffer);
+      const audioUrl = URL.createObjectURL(wavBlob);
+      notificationAudio = new Audio(audioUrl);
+      notificationAudio.volume = 0.6;
     } catch (e) {
-      console.warn("Failed to unlock AudioContext:", e);
+      console.warn("Failed to initialize offline audio chime:", e);
+    }
+  }
+
+  // Bless HTML5 Audio element on first user gesture to bypass autoplay block
+  const blessAudio = () => {
+    if (notificationAudio) {
+      notificationAudio.play().then(() => {
+        notificationAudio.pause();
+        notificationAudio.currentTime = 0;
+        console.log("Notification audio element blessed and unlocked!");
+      }).catch(e => {
+        console.warn("Could not bless audio yet:", e);
+      });
+      
+      document.removeEventListener('click', blessAudio);
+      document.removeEventListener('keydown', blessAudio);
+      document.removeEventListener('touchstart', blessAudio);
     }
   };
-  document.addEventListener('click', unlockAudio);
-  document.addEventListener('keydown', unlockAudio);
-  document.addEventListener('touchstart', unlockAudio);
+  document.addEventListener('click', blessAudio);
+  document.addEventListener('keydown', blessAudio);
+  document.addEventListener('touchstart', blessAudio);
 
   function playNewOrderSound() {
-    if (!soundEnabled) return;
+    if (!soundEnabled || !notificationAudio) return;
     
     stopNewOrderAlert();
     
-    try {
-      const ctx = getAudioContext();
+    let ringCount = 0;
+    const maxRings = 10; // 10 rings spaced by 3 seconds = 30 seconds
+    
+    const ring = () => {
+      if (!soundEnabled || ringCount >= maxRings || !notificationAudio) {
+        stopNewOrderAlert();
+        return;
+      }
       
-      let ringCount = 0;
-      const maxRings = 10; // 10 rings spaced by 3 seconds = 30 seconds
-      
-      const ring = () => {
-        if (!soundEnabled || ringCount >= maxRings) {
-          stopNewOrderAlert();
-          return;
-        }
-        
-        const now = ctx.currentTime;
-        // High-pitched metallic desk counter bell ("Ting!")
-        const freqs = [1500, 2200, 3000, 3700];
-        const gains = [0.15, 0.08, 0.05, 0.03];
-        
-        freqs.forEach((freq, index) => {
-          const osc = ctx.createOscillator();
-          const gainNode = ctx.createGain();
-          
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(freq, now);
-          
-          gainNode.gain.setValueAtTime(0, now);
-          // Sharp attack
-          gainNode.gain.linearRampToValueAtTime(gains[index], now + 0.002);
-          // Rapid initial decay, then long ringing tail
-          gainNode.gain.exponentialRampToValueAtTime(gains[index] * 0.1, now + 0.08);
-          gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
-          
-          osc.connect(gainNode);
-          gainNode.connect(ctx.destination);
-          
-          osc.start(now);
-          osc.stop(now + 1.3);
+      try {
+        notificationAudio.currentTime = 0;
+        notificationAudio.play().catch(e => {
+          console.warn("Playback prevented:", e);
         });
-        
-        ringCount++;
-      };
+      } catch (e) {
+        console.warn("Audio play error:", e);
+      }
       
-      // Play immediately
-      ring();
-      
-      // Repeat every 3 seconds
-      soundInterval = setInterval(ring, 3000);
-    } catch (e) {
-      console.warn("Failed to play audio alert:", e);
-    }
+      ringCount++;
+    };
+    
+    // Play immediately
+    ring();
+    
+    // Repeat every 3 seconds
+    soundInterval = setInterval(ring, 3000);
   }
 
   function stopNewOrderAlert() {
     if (soundInterval) {
       clearInterval(soundInterval);
       soundInterval = null;
+    }
+    if (notificationAudio) {
+      try {
+        notificationAudio.pause();
+        notificationAudio.currentTime = 0;
+      } catch (e) {}
     }
   }
 
@@ -1448,6 +1512,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .subscribe();
 
   // --- INITIAL LOAD ---
+  initNotificationAudio();
   loadProductsData().then(() => {
     loadMotoboysData().then(() => {
       loadDashboardData();
