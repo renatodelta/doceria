@@ -124,6 +124,10 @@
         <span class="material-symbols-outlined mr-3">inventory_2</span>
         <span class="text-sm">Estoque</span>
       </button>
+      <button id="nav-motoboys" class="w-full text-left flex items-center px-6 py-3 text-on-surface-variant font-medium hover:text-secondary hover:bg-surface-container-high transition-colors cursor-pointer select-none">
+        <span class="material-symbols-outlined mr-3">delivery_dining</span>
+        <span class="text-sm">Entregadores</span>
+      </button>
     </nav>
     
     <div class="px-6 mt-auto space-y-2 border-t border-outline-variant/10 pt-4">
@@ -301,6 +305,54 @@
       </div>
     </div>
 
+    <!-- View 4: Entregadores -->
+    <div id="view-motoboys" class="hidden flex-grow flex flex-col overflow-hidden h-full">
+      <div class="mb-6">
+        <h3 class="font-serif text-2xl font-bold text-secondary">Entregadores (Motoboys)</h3>
+        <p class="text-xs text-outline">Cadastre e gerencie a lista de motoboys para despacho e acompanhamento de entregas.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow overflow-hidden pb-24">
+        <!-- Cadastro de Motoboy -->
+        <div class="bg-surface-container-low border border-outline-variant/10 rounded-2xl p-6 h-fit">
+          <h4 class="text-sm font-bold text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">person_add</span> Cadastrar Entregador
+          </h4>
+          <form id="form-motoboy" class="space-y-4" onsubmit="event.preventDefault();">
+            <div class="flex flex-col gap-1.5">
+              <label for="input-motoboy-name" class="text-xs font-bold text-outline uppercase tracking-wider">Nome do Entregador</label>
+              <input type="text" id="input-motoboy-name" required class="bg-surface-container border border-outline-variant rounded-xl p-3 text-sm focus:ring-1 focus:ring-secondary/50 focus:border-secondary outline-none transition-all text-on-surface" placeholder="Ex: Roberto Silveira" />
+            </div>
+            <button id="btn-save-motoboy" type="submit" class="w-full bg-secondary hover:brightness-105 text-on-primary font-bold py-3 px-4 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+              <span class="material-symbols-outlined text-sm">save</span>
+              Cadastrar
+            </button>
+          </form>
+        </div>
+
+        <!-- Lista de Motoboys -->
+        <div class="lg:col-span-2 bg-surface-container-low border border-outline-variant/10 rounded-2xl p-6 flex flex-col overflow-hidden h-full">
+          <h4 class="text-sm font-bold text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">delivery_dining</span> Entregadores Cadastrados
+          </h4>
+          <div class="flex-grow overflow-y-auto kanban-scroll pr-1">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="border-b border-outline-variant/20 text-outline text-xs uppercase font-semibold">
+                  <th class="py-3 px-4">Nome</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4 text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="motoboys-table-body">
+                <!-- Populated Dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- Modal: Cadastro/Edição de Produto -->
@@ -439,9 +491,6 @@
         <div class="relative">
           <select class="w-full bg-surface-container border border-outline-variant rounded-xl p-3 text-sm focus:ring-1 focus:ring-secondary/50 focus:border-secondary outline-none transition-all text-on-surface" id="select-motoboy">
             <option value="">Selecione um motoboy...</option>
-            <option value="Carlos Silva">Carlos Silva (Online)</option>
-            <option value="João Santos">João Santos (Online)</option>
-            <option value="Roberto Silveira">Roberto Silveira (Offline)</option>
           </select>
         </div>
       </div>

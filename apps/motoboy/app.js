@@ -4,12 +4,13 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   // --- CONFIGURATION ---
-  let currentRider = 'Carlos Silva'; // Toggleable to 'João Santos' for test flexibility
+  let currentRider = '';
   let isOnline = true;
   let orders = [];
+  let motoboysList = [];
 
   // --- UI ELEMENTS ---
-  const txtRiderName = document.getElementById('txt-rider-name');
+  const selectRiderProfile = document.getElementById('select-rider-profile');
   const btnStatusToggle = document.getElementById('btn-status-toggle');
   const txtStatusLabel = document.getElementById('txt-status-label');
 
@@ -26,14 +27,93 @@ document.addEventListener('DOMContentLoaded', () => {
   const successOverlay = document.getElementById('success-overlay');
   const btnSuccessClose = document.getElementById('btn-success-close');
 
-  // Toggle rider profile on name click (for developer testing!)
-  txtRiderName.style.cursor = 'pointer';
-  txtRiderName.onclick = () => {
-    currentRider = currentRider === 'Carlos Silva' ? 'João Santos' : 'Carlos Silva';
-    txtRiderName.textContent = currentRider;
+  // --- LOAD MOTOBOYS & POPULATE SELECT ---
+  async function loadMotoboys() {
+    try {
+      const { data, error } = await supabaseClient
+        .from('motoboys')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        motoboysList = data;
+        
+        selectRiderProfile.innerHTML = '';
+        motoboysList.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.name;
+          opt.textContent = m.name;
+          selectRiderProfile.appendChild(opt);
+        });
+
+        // Restore last selected rider or use first
+        const savedRider = localStorage.getItem('motoboy_app_current_rider');
+        if (savedRider && motoboysList.some(m => m.name === savedRider)) {
+          currentRider = savedRider;
+        } else {
+          currentRider = motoboysList[0].name;
+        }
+        selectRiderProfile.value = currentRider;
+        
+        // Sync active rider's status
+        const activeRiderData = motoboysList.find(m => m.name === currentRider);
+        if (activeRiderData) {
+          isOnline = activeRiderData.status === 'online';
+          updateStatusUI();
+        }
+      } else {
+        selectRiderProfile.innerHTML = '<option value="">Sem entregadores</option>';
+        currentRider = '';
+      }
+    } catch (err) {
+      console.error("Erro ao carregar entregadores:", err);
+      // Fallback
+      motoboysList = [
+        { name: 'Carlos Silva', status: 'online' },
+        { name: 'João Santos', status: 'online' },
+        { name: 'Roberto Silveira', status: 'offline' }
+      ];
+      selectRiderProfile.innerHTML = '';
+      motoboysList.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.name;
+        opt.textContent = m.name;
+        selectRiderProfile.appendChild(opt);
+      });
+      currentRider = 'Carlos Silva';
+      selectRiderProfile.value = currentRider;
+    }
+
     loadDeliveries();
-    alert(`Alterado para o perfil do Entregador: ${currentRider}`);
-  };
+  }
+
+  // Change rider profile
+  if (selectRiderProfile) {
+    selectRiderProfile.onchange = async () => {
+      currentRider = selectRiderProfile.value;
+      if (!currentRider) return;
+
+      localStorage.setItem('motoboy_app_current_rider', currentRider);
+
+      // Turn online by default when selecting profile
+      isOnline = true;
+      updateStatusUI();
+      
+      try {
+        await supabaseClient
+          .from('motoboys')
+          .update({ status: 'online' })
+          .eq('name', currentRider);
+      } catch (e) {
+        console.error("Erro ao atualizar status do entregador no Supabase", e);
+      }
+
+      loadDeliveries();
+      alert(`Bem-vindo, ${currentRider}! Seu perfil foi ativado.`);
+    };
+  }
 
   // --- LOAD DATA ---
   // --- LOAD DATA FROM SUPABASE ---
@@ -365,9 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnTabActive.onclick = () => switchTab('active');
   btnTabHistory.onclick = () => switchTab('history');
 
-  // --- ONLINE STATUS SWITCH ---
-  btnStatusToggle.onclick = () => {
-    isOnline = !isOnline;
+  function updateStatusUI() {
     if (isOnline) {
       btnStatusToggle.className = "w-8 h-8 bg-success/10 text-success rounded-full flex items-center justify-center";
       btnStatusToggle.querySelector('span').textContent = 'wifi';
@@ -378,6 +456,23 @@ document.addEventListener('DOMContentLoaded', () => {
       btnStatusToggle.querySelector('span').textContent = 'wifi_off';
       txtStatusLabel.textContent = 'Offline';
       txtStatusLabel.className = "text-[9px] font-bold text-outline uppercase tracking-wider";
+    }
+  }
+
+  // --- ONLINE STATUS SWITCH ---
+  btnStatusToggle.onclick = async () => {
+    isOnline = !isOnline;
+    updateStatusUI();
+    
+    if (currentRider) {
+      try {
+        await supabaseClient
+          .from('motoboys')
+          .update({ status: isOnline ? 'online' : 'offline' })
+          .eq('name', currentRider);
+      } catch (e) {
+        console.error("Erro ao atualizar status do motoboy no Supabase:", e);
+      }
     }
     loadDeliveries();
   };
@@ -468,5 +563,5 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- INITIAL LOAD ---
-  loadDeliveries();
+  loadMotoboys();
 });

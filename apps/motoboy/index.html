@@ -162,9 +162,11 @@
         <div class="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
           <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">motorcycle</span>
         </div>
-        <div>
-          <h1 class="font-bold text-xs text-on-surface leading-none" id="txt-rider-name">Carlos Silva</h1>
-          <span class="text-[9px] uppercase tracking-wider text-outline font-bold">Entregador</span>
+        <div class="flex flex-col">
+          <select id="select-rider-profile" class="font-bold text-xs text-on-surface bg-transparent border-none outline-none cursor-pointer focus:ring-0 p-0 m-0 leading-none">
+            <option value="">Carregando...</option>
+          </select>
+          <span class="text-[9px] uppercase tracking-wider text-outline font-bold leading-none mt-0.5">Entregador</span>
         </div>
       </div>
       <div class="flex items-center gap-2 select-none">

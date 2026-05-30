@@ -6,9 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- STATE ---
   let orders = [];
   let products = [];
+  let motoboys = [];
   let selectedOrder = null;
   let searchQuery = '';
-  let activeView = 'orders'; // 'orders', 'products', 'stock'
+  let activeView = 'orders'; // 'orders', 'products', 'stock', 'motoboys'
 
   // --- UI ELEMENTS ---
   const listPending = document.getElementById('list-pending');
@@ -52,10 +53,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const navOrders = document.getElementById('nav-orders');
   const navProducts = document.getElementById('nav-products');
   const navStock = document.getElementById('nav-stock');
+  const navMotoboys = document.getElementById('nav-motoboys');
 
   const viewOrders = document.getElementById('view-orders');
   const viewProducts = document.getElementById('view-products');
   const viewStock = document.getElementById('view-stock');
+  const viewMotoboys = document.getElementById('view-motoboys');
+
+  const formMotoboy = document.getElementById('form-motoboy');
+  const inputMotoboyName = document.getElementById('input-motoboy-name');
+  const motoboysTableBody = document.getElementById('motoboys-table-body');
 
   const productsListContainer = document.getElementById('products-list-container');
   const stockTableBody = document.getElementById('stock-table-body');
@@ -549,8 +556,9 @@ document.addEventListener('DOMContentLoaded', () => {
     viewOrders.classList.add('hidden');
     viewProducts.classList.add('hidden');
     viewStock.classList.add('hidden');
+    viewMotoboys.classList.add('hidden');
 
-    const navButtons = [navOrders, navProducts, navStock];
+    const navButtons = [navOrders, navProducts, navStock, navMotoboys];
     navButtons.forEach(btn => {
       btn.className = "w-full text-left flex items-center px-6 py-3 text-on-surface-variant font-medium hover:text-secondary hover:bg-surface-container-high transition-colors cursor-pointer select-none";
     });
@@ -573,12 +581,159 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelector('header h2').textContent = "Controle de Estoque";
       inputSearchOrders.parentElement.classList.add('hidden');
       renderStockTab();
+    } else if (viewId === 'motoboys') {
+      viewMotoboys.classList.remove('hidden');
+      navMotoboys.className = "w-full text-left flex items-center px-6 py-3 text-secondary font-bold border-r-4 border-secondary bg-secondary-container/15 transition-transform active:scale-[0.98] cursor-pointer select-none";
+      document.querySelector('header h2').textContent = "Entregadores (Motoboys)";
+      inputSearchOrders.parentElement.classList.add('hidden');
+      renderMotoboysTab();
     }
   }
 
   navOrders.onclick = () => switchView('orders');
   navProducts.onclick = () => switchView('products');
   navStock.onclick = () => switchView('stock');
+  navMotoboys.onclick = () => switchView('motoboys');
+
+  // --- MOTOBOYS DATA LOAD & RENDER ---
+  async function loadMotoboysData() {
+    try {
+      const { data, error } = await supabaseClient
+        .from('motoboys')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+
+      if (data) {
+        motoboys = data;
+      } else {
+        motoboys = [];
+      }
+    } catch (e) {
+      console.error("Error loading motoboys from Supabase", e);
+      // Fallback
+      motoboys = [
+        { id: 1, name: 'Carlos Silva', status: 'online' },
+        { id: 2, name: 'João Santos', status: 'online' },
+        { id: 3, name: 'Roberto Silveira', status: 'offline' }
+      ];
+    }
+
+    renderMotoboySelect();
+    if (activeView === 'motoboys') {
+      renderMotoboysTab();
+    }
+  }
+
+  function renderMotoboySelect() {
+    if (!selectMotoboy) return;
+    // Guardar valor atualmente selecionado para não resetar se houver recarga
+    const currentVal = selectMotoboy.value;
+    selectMotoboy.innerHTML = '<option value="">Selecione um motoboy...</option>';
+    motoboys.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.name;
+      const statusLabel = m.status === 'online' ? 'Online' : 'Offline';
+      opt.textContent = `${m.name} (${statusLabel})`;
+      selectMotoboy.appendChild(opt);
+    });
+    // Restaurar valor se ele ainda existir nas opções
+    if (currentVal && Array.from(selectMotoboy.options).some(opt => opt.value === currentVal)) {
+      selectMotoboy.value = currentVal;
+    }
+  }
+
+  function renderMotoboysTab() {
+    if (!motoboysTableBody) return;
+    motoboysTableBody.innerHTML = '';
+
+    if (motoboys.length === 0) {
+      motoboysTableBody.innerHTML = `
+        <tr>
+          <td colspan="3" class="py-8 text-center text-outline opacity-60">
+            Nenhum entregador cadastrado. Cadastre um ao lado.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    motoboys.forEach(m => {
+      const tr = document.createElement('tr');
+      tr.className = "border-b border-outline-variant/10 text-on-surface hover:bg-surface-container-high transition-colors";
+
+      const statusColor = m.status === 'online' ? 'bg-success/15 text-success' : 'bg-outline/20 text-outline';
+      const statusLabel = m.status === 'online' ? 'Online' : 'Offline';
+
+      tr.innerHTML = `
+        <td class="py-4 px-4 font-bold">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-outline text-lg">delivery_dining</span>
+            <span>${m.name}</span>
+          </div>
+        </td>
+        <td class="py-4 px-4">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${statusColor}">
+            <span class="w-1.5 h-1.5 rounded-full ${m.status === 'online' ? 'bg-success' : 'bg-outline'} ${m.status === 'online' ? 'animate-pulse' : ''}"></span>
+            ${statusLabel}
+          </span>
+        </td>
+        <td class="py-4 px-4 text-right">
+          <button class="text-error hover:text-error/80 p-2 hover:bg-error-container/20 rounded-xl transition-all cursor-pointer inline-flex items-center justify-center btn-delete-motoboy" data-id="${m.id}">
+            <span class="material-symbols-outlined text-lg">delete</span>
+          </button>
+        </td>
+      `;
+
+      // Wire up the delete button
+      tr.querySelector('.btn-delete-motoboy').onclick = async () => {
+        if (confirm(`Tem certeza que deseja excluir o entregador "${m.name}"?`)) {
+          try {
+            const { error } = await supabaseClient
+              .from('motoboys')
+              .delete()
+              .eq('id', m.id);
+
+            if (error) throw error;
+            alert('Entregador excluído com sucesso!');
+            await loadMotoboysData();
+          } catch (err) {
+            console.error("Erro ao deletar entregador:", err);
+            alert("Não foi possível excluir o entregador.");
+          }
+        }
+      };
+
+      motoboysTableBody.appendChild(tr);
+    });
+  }
+
+  if (formMotoboy) {
+    formMotoboy.onsubmit = async (e) => {
+      e.preventDefault();
+      const name = inputMotoboyName.value.trim();
+      if (!name) return;
+
+      try {
+        const { error } = await supabaseClient
+          .from('motoboys')
+          .insert({
+            name: name,
+            status: 'offline'
+          });
+
+        if (error) throw error;
+
+        inputMotoboyName.value = '';
+        alert('Entregador cadastrado com sucesso!');
+        await loadMotoboysData();
+      } catch (err) {
+        console.error("Erro ao cadastrar entregador:", err);
+        alert("Erro ao cadastrar entregador. Verifique se o nome já existe.");
+      }
+    };
+  }
 
   // --- PRODUCTS VIEW RENDER ---
   function renderProductsTab() {
@@ -876,12 +1031,15 @@ document.addEventListener('DOMContentLoaded', () => {
     icon.classList.add('animate-spin');
     
     await loadProductsData();
+    await loadMotoboysData();
     await loadDashboardData();
     
     if (activeView === 'products') {
       renderProductsTab();
     } else if (activeView === 'stock') {
       renderStockTab();
+    } else if (activeView === 'motoboys') {
+      renderMotoboysTab();
     }
     setTimeout(() => icon.classList.remove('animate-spin'), 600);
   };
@@ -890,7 +1048,7 @@ document.addEventListener('DOMContentLoaded', () => {
   drawerOverlay.onclick = closeDrawer;
 
   // --- REAL-TIME SYNC VIA SUPABASE ---
-  // Inscrições Realtime para pedidos e produtos
+  // Inscrições Realtime para pedidos, produtos e motoboys
   const ordersSubscription = supabaseClient
     .channel('public:pedidos')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, (payload) => {
@@ -910,8 +1068,18 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .subscribe();
 
+  const motoboysSubscription = supabaseClient
+    .channel('public:motoboys')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'motoboys' }, (payload) => {
+      console.log('Motoboys atualizados no Supabase:', payload);
+      loadMotoboysData();
+    })
+    .subscribe();
+
   // --- INITIAL LOAD ---
   loadProductsData().then(() => {
-    loadDashboardData();
+    loadMotoboysData().then(() => {
+      loadDashboardData();
+    });
   });
 });
