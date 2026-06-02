@@ -179,6 +179,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputAddressNumber = document.getElementById('input-address-number');
   const inputAddressNeighborhood = document.getElementById('input-address-neighborhood');
   const inputAddressComplement = document.getElementById('input-address-complement');
+  const inputPayment = document.getElementById('input-payment');
+  const notesContainer = document.getElementById('notes-container');
+  const inputNotes = document.getElementById('input-notes');
 
   // Mobile elements
   const floatingCartBtn = document.getElementById('floating-cart');
@@ -503,6 +506,21 @@ document.addEventListener('DOMContentLoaded', () => {
       inputAddressNeighborhood.required = true;
     }
     calculateTotals();
+  }
+
+  // --- TOGGLE NOTES CONTAINER DYNAMICALLY ---
+  function toggleNotes() {
+    if (!inputPayment || !notesContainer) return;
+    if (inputPayment.value === 'dinheiro') {
+      notesContainer.classList.remove('hidden');
+    } else {
+      notesContainer.classList.add('hidden');
+      if (inputNotes) inputNotes.value = '';
+    }
+  }
+
+  if (inputPayment) {
+    inputPayment.addEventListener('change', toggleNotes);
   }
 
   radioDelivery.onchange = () => {
@@ -838,6 +856,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadProductsFromSupabase();
   updateCartUI();
   toggleAddress();
+  toggleNotes();
 
   // Update status every minute
   setInterval(checkStoreStatus, 60000);
