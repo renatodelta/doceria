@@ -173,72 +173,98 @@ document.addEventListener('DOMContentLoaded', () => {
           stock: item.stock
         }));
       } else {
-        // Fallback local se o banco estiver vazio
-        products = [
+        // Se o banco estiver vazio, semear os produtos iniciais diretamente no Supabase
+        const defaultProducts = [
           {
-            id: 1,
             category: 'paes',
             name: 'Sourdough Tradicional',
-            desc: 'Pão de fermentação natural de 24h, casca crocante rústica e miolo extremamente aerado.',
+            description: 'Pão de fermentação natural de 24h, casca crocante rústica e miolo extremamente aerado.',
             price: 24.90,
             image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDURZ5ewq1HLTSRYLo3mJhmQB8cCH8vrEIJRKnpfvkyK6NbtMo6p7dfxElzAFF3_hVbnfzbZv1SaqDQ_Ch_01HDsIiT730wit9m7N9jNYP1dXVnZ0wOYg-9jhV-loh62hP6lXaAuahY_yPmZaB2oAhBJz3NP6KnA0SonsANaV-DfbkffTG6vPull_2690Mj5OHLG50W_yOYXPY4DcWKOZF6kUyPzWdY2V6OxcY6P4bI0j6FZYdy4gCKijV4-JEG0Xs6_11wHUWM_64I',
             stock: null
           },
           {
-            id: 2,
             category: 'paes',
             name: 'Croissant Amanteigado',
-            desc: 'Massa folhada tradicional francesa preparada com manteiga nobre extrafina.',
+            description: 'Massa folhada tradicional francesa preparada com manteiga nobre extrafina.',
             price: 12.50,
             image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCubvmWz31qf2V3sGfp3ao8B-sJHNYGqDJ8eTOAipNj2tF0cayZY0lhzsiJFaAuo7Z0bUa6I4oQ-1Pfd7xkXejS19GcaWKQixrzUHji2pSu-ElKOSUK25sUAkaCKEmXZ5P5bfCblcuCip95Nadi5R5ShPFuqs42D2RySzbEoQAtQjN5w4Yz-7Dc3JGZc6iCVIB2C3bzK97pi7CpTJWc9lDPdV0ehc0136PUKp4ZzwkhPKwWQc6B20Wy1m-uBfFJ4Y1b4HbOOuUKLlav',
             stock: null
           },
           {
-            id: 3,
             category: 'paes',
             name: 'Pão de Sal (Francês)',
-            desc: 'O pãozinho crocante tradicional queridinho do brasileiro, quentinho e fresco.',
+            description: 'O pãozinho crocante tradicional queridinho do brasileiro, quentinho e fresco.',
             price: 0.90,
             image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAmhZiYZkOBjp1S6MiWq3cFQePrGtPJ8Ezy7fDuhpeE_13S-DWHXtXQU0Z65mW32HATCXQtSFh7bmy6CgyXaCa4DH1XDDgFaUNddk8woNevd50j-Ezy3WHYw5pku5vWO8TMrpsiqNb_iBpCYii0zsedn2vnpJ7AfzByHxsgPvU6biTVlRgFRRUmHUDrKkMTaGrF1XzGcwkHo-br4bbwxBTpui_E4ywjof7I_vFqSMyLhuC0Bs0MbEaJziznAu9hrRcOz1G1zAo20UOg',
             stock: null
           },
           {
-            id: 4,
             category: 'bolos',
             name: 'Bolo de Cenoura com Chocolate',
-            desc: 'Massa super fofinha de cenoura com cobertura generosa de brigadeiro cremoso.',
+            description: 'Massa super fofinha de cenoura com cobertura generosa de brigadeiro cremoso.',
             price: 24.99,
             image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDbsDioPt-EBqYcTg11IBTlFHj2UqRWQAa4oWl78MreIzbf1YYwVXYC0vDp6osfqMpZtmrXDcJrejauLU709Uxvi6TYmK3oR0k1QyiVcqM99FB5wA8ER2sF9zxIcpH12Hg0Jh4QH897FBRMxjeo_OR-jjpdVfZ1js9B4sg0bGyVxxzsTdLtGhDHvIYmQ5rizwjuHEW_71_OD7Cvi6Mvcy0v3MxJ4Ls7r1rHDtQlsfufQrEfRsrFhz82Abw65_WV5BYr4ayLOaTSyheY',
             stock: null
           },
           {
-            id: 5,
             category: 'bolos',
             name: 'Bolo de Fubá com Goiabada',
-            desc: 'Bolo caseiro de fubá tradicional com cubos derretidos de goiabada cascão na massa.',
+            description: 'Bolo caseiro de fubá tradicional com cubos derretidos de goiabada cascão na massa.',
             price: 19.99,
             image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuARO2zy58MYs2JDEJDsiCQQFRECDxhQU6tvGvaF-J19P55VfzxzT29xMACoANw4A16P0NjGA5bHcDxHvV14qTyxpm5oI_jzRkCnkwjws0E1Vkq_iqbLW33TgzB1gwXEQstdEf-FOGSHbKAzSyebJyjmW4ZJUw-6Dgn0x9pdNZMbnsIpyRlY8kFylVPyEocgoXGcG5-xpocSDUCmiVAh8jYm_B300anSx3F5LJRXAwaBIwxUQ0LvjNaD5wYI9qnYsaT_SojA581Hy2oM',
             stock: null
           },
           {
-            id: 6,
             category: 'bolos',
             name: 'Bolo de Milho Cremoso',
-            desc: 'Massa cremosa de milho verde com coco ralado, fofinho e com gostinho de fazenda.',
+            description: 'Massa cremosa de milho verde com coco ralado, fofinho e com gostinho de fazenda.',
             price: 22.99,
             image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDbgoR--5YR0uWGcBfnopi_U-hWVcjcGLKfNYE9HUbtNenV_l-_ETYmYqNdJdDzXMdFbYUIoKHuyi2GzJB7tXk5C2-HDJcTINRvg8GzbG56ooZ57d2KFVymdeC7xzrfU3IRCcj6TDgC6FN6LiC0NV3_oArWTxhgQz_M0myUFlfy4La2Cj1Xt8dzpCvg7a1VYBGklxfFYvFs5h96zLnOz5R6_d23HuafxgUgki1SEgMsnfi57WztDSqnGgLAYsbf0vNTkzOWew6Z38gh',
             stock: null
           },
           {
-            id: 7,
             category: 'bolos',
             name: 'Bolo de Laranja Fresca',
-            desc: 'Preparado com suco puro de laranjas frescas e calda leve cítrica açucarada.',
+            description: 'Preparado com suco puro de laranjas frescas e calda leve cítrica açucarada.',
             price: 19.99,
             image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCubvmWz31qf2V3sGfp3ao8B-sJHNYGqDJ8eTOAipNj2tF0cayZY0lhzsiJFaAuo7Z0bUa6I4oQ-1Pfd7xkXejS19GcaWKQixrzUHji2pSu-ElKOSUK25sUAkaCKEmXZ5P5bfCblcuCip95Nadi5R5ShPFuqs42D2RySzbEoQAtQjN5w4Yz-7Dc3JGZc6iCVIB2C3bzK97pi7CpTJWc9lDPdV0ehc0136PUKp4ZzwkhPKwWQc6B20Wy1m-uBfFJ4Y1b4HbOOuUKLlav',
             stock: null
           }
         ];
+
+        try {
+          const { data: insertedData, error: insertError } = await supabaseClient
+            .from('produtos')
+            .insert(defaultProducts)
+            .select();
+
+          if (insertError) throw insertError;
+
+          if (insertedData) {
+            products = insertedData.map(item => ({
+              id: item.id,
+              category: item.category,
+              name: item.name,
+              desc: item.description || item.desc || '',
+              price: parseFloat(item.price),
+              image: item.image,
+              stock: item.stock
+            }));
+          }
+        } catch (err) {
+          console.error("Erro ao semear produtos padrão no Supabase:", err);
+          // Fallback local se der erro no insert
+          products = defaultProducts.map((item, idx) => ({
+            id: idx + 1,
+            category: item.category,
+            name: item.name,
+            desc: item.description,
+            price: item.price,
+            image: item.image,
+            stock: item.stock
+          }));
+        }
       }
     } catch (e) {
       console.error("Error loading products from Supabase", e);
@@ -1021,14 +1047,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const categoryLabel = prod.category === 'paes' ? '🥖 Pão' : '🍰 Bolo';
       const isUnlimited = prod.stock === undefined || prod.stock === null || prod.stock === "";
       const stockVal = isUnlimited ? 0 : parseInt(prod.stock, 10);
+      const minStockVal = isUnlimited ? 0 : parseInt(localStorage.getItem(`min_stock_${prod.id}`) || '3', 10);
 
       let statusBadgeHTML = '';
       if (isUnlimited) {
         statusBadgeHTML = '<span class="bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider select-none">Ilimitado</span>';
-      } else if (stockVal > 0) {
-        statusBadgeHTML = `<span class="bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider select-none">${stockVal} Disponíveis</span>`;
-      } else {
+      } else if (stockVal === 0) {
         statusBadgeHTML = '<span class="bg-red-500/10 text-red-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider select-none">Esgotado</span>';
+      } else if (stockVal <= minStockVal) {
+        statusBadgeHTML = `<span class="bg-amber-500/10 text-amber-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider select-none">${stockVal} Baixo Estoque</span>`;
+      } else {
+        statusBadgeHTML = `<span class="bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider select-none">${stockVal} Disponíveis</span>`;
       }
 
       tr.innerHTML = `
@@ -1048,6 +1077,11 @@ document.addEventListener('DOMContentLoaded', () => {
             </button>
           </div>
         </td>
+        <td class="py-4 px-4">
+          <div class="flex items-center justify-center select-none">
+            <input type="number" min="0" value="${minStockVal}" class="w-16 bg-surface border border-outline-variant rounded-lg p-1.5 text-center text-sm focus:ring-1 focus:ring-secondary/50 focus:border-secondary outline-none transition-all text-on-surface font-semibold input-min-stock-value disabled:opacity-30 disabled:cursor-not-allowed" data-id="${prod.id}" ${isUnlimited ? 'disabled' : ''} />
+          </div>
+        </td>
         <td class="py-4 px-4 text-right">${statusBadgeHTML}</td>
       `;
 
@@ -1056,6 +1090,11 @@ document.addEventListener('DOMContentLoaded', () => {
       tr.querySelector('.input-stock-value').onchange = (e) => {
         const val = Math.max(0, parseInt(e.target.value, 10) || 0);
         updateStockValue(prod.id, val);
+      };
+      tr.querySelector('.input-min-stock-value').onchange = (e) => {
+        const val = Math.max(0, parseInt(e.target.value, 10) || 0);
+        localStorage.setItem(`min_stock_${prod.id}`, val);
+        renderStockTab();
       };
       tr.querySelector('.btn-stock-toggle-limit').onclick = () => toggleStockLimit(prod.id);
 
@@ -1109,7 +1148,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let newStock = null;
     if (prod.stock === undefined || prod.stock === null || prod.stock === "") {
-      newStock = 10;
+      const promptVal = prompt(`Defina a quantidade inicial em estoque para "${prod.name}":`, "10");
+      if (promptVal === null) return; // Cancela se o usuário fechar o prompt
+      newStock = Math.max(0, parseInt(promptVal, 10) || 0);
     }
 
     try {
