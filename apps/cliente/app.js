@@ -180,6 +180,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputAddressNeighborhood = document.getElementById('input-address-neighborhood');
   const inputAddressComplement = document.getElementById('input-address-complement');
   const inputPayment = document.getElementById('input-payment');
+  const changeContainer = document.getElementById('change-container');
+  const inputChange = document.getElementById('input-change');
   const notesContainer = document.getElementById('notes-container');
   const inputNotes = document.getElementById('input-notes');
 
@@ -510,11 +512,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- TOGGLE NOTES CONTAINER DYNAMICALLY ---
   function toggleNotes() {
-    if (!inputPayment || !notesContainer) return;
+    if (!inputPayment || !notesContainer || !changeContainer) return;
     if (inputPayment.value === 'dinheiro') {
+      changeContainer.classList.remove('hidden');
       notesContainer.classList.remove('hidden');
     } else {
+      changeContainer.classList.add('hidden');
       notesContainer.classList.add('hidden');
+      if (inputChange) inputChange.value = '';
       if (inputNotes) inputNotes.value = '';
     }
   }
@@ -684,7 +689,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     const payment = document.getElementById('input-payment').value;
-    const notes = document.getElementById('input-notes').value.trim();
+    let notes = document.getElementById('input-notes').value.trim();
+    const changeVal = document.getElementById('input-change').value.trim();
+    if (payment === 'dinheiro' && changeVal) {
+      notes = `Troco para: ${changeVal}` + (notes ? ` | Obs: ${notes}` : '');
+    }
 
     if (!name || name.length < 3) {
       alert("Por favor, insira seu nome completo (mínimo de 3 letras).");
@@ -853,6 +862,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       updateCartUI();
       toggleAddress();
+      toggleNotes();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 300);
   };

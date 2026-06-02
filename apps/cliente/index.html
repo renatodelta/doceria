@@ -211,10 +211,16 @@
           <div class="form-group">
             <label for="input-payment">Forma de Pagamento</label>
             <select id="input-payment" required>
+              <option value="" disabled selected hidden>Selecione a forma de pagamento...</option>
               <option value="pix">PIX</option>
               <option value="cartao_entrega">Cartão (na entrega)</option>
               <option value="dinheiro">Dinheiro</option>
             </select>
+          </div>
+
+          <div class="form-group hidden" id="change-container">
+            <label for="input-change">Precisa de troco? Para quanto?</label>
+            <input id="input-change" placeholder="Ex: Troco para R$ 50,00" type="text" />
           </div>
 
           <div class="form-group hidden" id="notes-container">
@@ -224,7 +230,7 @@
               ℹ️ <strong>Importante:</strong> Todos os nossos bolos são produzidos com cobertura padrão e não é possível
               retirá-la ou alterá-la.
             </span>
-            <textarea id="input-notes" rows="2" placeholder="Ex: Troco para R$ 50, talheres..."></textarea>
+            <textarea id="input-notes" rows="2" placeholder="Ex: Talheres, velas..."></textarea>
           </div>
 
           <!-- Checkout trigger button -->
