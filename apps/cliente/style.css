@@ -64,7 +64,7 @@ h1, h2, h3, .font-serif {
 .store-header {
     position: relative;
     background-color: var(--primary);
-    background-image: linear-gradient(to bottom, rgba(44, 34, 30, 0.65), rgba(29, 28, 13, 0.85)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuDOnvXrK54BXcX4y1sUZBnX5ybmmIpRSFKZwfvxm0HBDLsD8M3d1HsS-tZQ2bB0q_cfEUIARzub4JiTHtvD1MklZzyyodZoT6d3M8mDkvU9rwwvPk9HwlbgSAfvIrwRoW1_S73qIjszgJ1RLQnAA7zwu0FKbo3uw7k8emyOmmFgZB3zTUtpMU7ENwmMl7mZE6AXc70XvZ9YmHLoyfbuOIyYSmPlKFo3fhlAhbWg5qyjux6ZYPhgGEn8d0m1yiMDNJpphzriWy7_eTRL');
+    background-image: linear-gradient(to bottom, rgba(44, 34, 30, 0.65), rgba(29, 28, 13, 0.85)), url('cake_banner_bg.png');
     background-size: cover;
     background-position: center;
     padding: 60px 20px 90px 20px;

@@ -1031,9 +1031,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const categoryLabel = prod.category === 'paes' ? '🥖 Pão' : '🍰 Bolo';
       const categoryColor = prod.category === 'paes' ? 'bg-secondary-container/20 text-secondary' : 'bg-tertiary-container/20 text-tertiary';
 
+      const imageSrc = formatImageUrl(prod.image);
+      const imageHtml = imageSrc 
+        ? `<img src="${imageSrc}" alt="${prod.name}" class="w-full h-full object-cover" />`
+        : `<div class="w-full h-full flex flex-col items-center justify-center bg-surface-container-high/40 text-outline/60 gap-2">
+            <span class="material-symbols-outlined text-3xl">image</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Sem Imagem</span>
+           </div>`;
+
       card.innerHTML = `
         <div class="relative aspect-video bg-surface-dim overflow-hidden border-b border-outline-variant/10">
-          <img src="${formatImageUrl(prod.image)}" alt="${prod.name}" class="w-full h-full object-cover" />
+          ${imageHtml}
           <span class="absolute top-3 left-3 ${categoryColor} px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">${categoryLabel}</span>
         </div>
         <div class="p-5 flex-grow flex flex-col justify-between gap-4">
@@ -1087,7 +1095,7 @@ document.addEventListener('DOMContentLoaded', () => {
       formProductName.value = prod.name;
       formProductCategory.value = prod.category;
       formProductPrice.value = prod.price;
-      formProductImage.value = prod.image;
+      formProductImage.value = prod.image || '';
       formProductDesc.value = prod.desc;
     } else {
       modalProductTitle.textContent = "Novo Produto";
@@ -1126,7 +1134,7 @@ document.addEventListener('DOMContentLoaded', () => {
             name,
             category,
             price,
-            image,
+            image: image || null,
             description: desc
           })
           .eq('id', parseInt(idVal));
@@ -1139,7 +1147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             name,
             category,
             price,
-            image,
+            image: image || null,
             description: desc,
             stock: null
           }]);
@@ -1212,9 +1220,16 @@ document.addEventListener('DOMContentLoaded', () => {
         statusBadgeHTML = `<span class="bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider select-none">${stockVal} Disponíveis</span>`;
       }
 
+      const imageSrc = formatImageUrl(prod.image);
+      const imageHtml = imageSrc 
+        ? `<img src="${imageSrc}" alt="${prod.name}" class="w-10 h-10 object-cover rounded-lg border border-outline-variant/10 flex-shrink-0" />`
+        : `<div class="w-10 h-10 bg-surface-container border border-outline-variant/10 rounded-lg flex items-center justify-center text-outline/60 flex-shrink-0">
+            <span class="material-symbols-outlined text-lg">image</span>
+           </div>`;
+
       tr.innerHTML = `
         <td class="py-4 px-4 flex items-center gap-3">
-          <img src="${formatImageUrl(prod.image)}" alt="${prod.name}" class="w-10 h-10 object-cover rounded-lg border border-outline-variant/10 flex-shrink-0" />
+          ${imageHtml}
           <span class="font-semibold text-on-surface">${prod.name}</span>
         </td>
         <td class="py-4 px-4 text-on-surface-variant">${categoryLabel}</td>

@@ -313,9 +313,16 @@ document.addEventListener('DOMContentLoaded', () => {
           `;
         }
 
+        const imageHtml = prod.image
+          ? `<img class="product-image" src="${prod.image}" alt="${prod.name}"/>`
+          : `<div class="w-full h-full flex flex-col items-center justify-center gap-1.5" style="background-color: rgba(139, 115, 102, 0.08); color: var(--text-muted); display: flex; align-items: center; justify-content: center; height: 100%;">
+              <span class="material-symbols-outlined" style="font-size: 32px;">image</span>
+              <span style="font-size: 0.75rem; font-weight: 600; font-family: inherit;">Sem Imagem</span>
+             </div>`;
+
         productCard.innerHTML = `
           <div class="product-image-container">
-            <img class="product-image" src="${prod.image}" alt="${prod.name}"/>
+            ${imageHtml}
           </div>
           <div class="product-info">
             <div class="product-details">
@@ -861,8 +868,13 @@ document.addEventListener('DOMContentLoaded', () => {
     itemsShow.forEach(item => {
       const row = document.createElement('div');
       row.className = "success-basket-row";
+      const imageHtml = item.image
+        ? `<img class="success-basket-img" src="${item.image}" alt="${item.name}"/>`
+        : `<div class="success-basket-img flex items-center justify-center" style="background-color: rgba(139, 115, 102, 0.08); color: var(--text-muted); display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="font-size: 20px;">image</span>
+           </div>`;
       row.innerHTML = `
-        <img class="success-basket-img" src="${item.image}" alt="${item.name}"/>
+        ${imageHtml}
         <div class="success-basket-text">
           <p class="success-basket-name">${item.name}</p>
           <p class="success-basket-qty">${item.qty} unidade(s)</p>

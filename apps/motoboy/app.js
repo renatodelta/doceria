@@ -347,17 +347,23 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }
       
-      const itemsListHTML = order.items.map(item => `
+      const itemsListHTML = order.items.map(item => {
+        const itemImage = item.image || item.img;
+        const imageHTML = itemImage
+          ? `<img alt="${item.name}" class="w-full h-full object-cover" src="${formatImageUrl(itemImage)}"/>`
+          : `<div class="w-full h-full flex items-center justify-center text-outline/60 bg-surface-container-high/40"><span class="material-symbols-outlined text-lg">image</span></div>`;
+        return `
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-surface-dim">
-            <img alt="${item.name}" class="w-full h-full object-cover" src="${formatImageUrl(item.image || item.img)}"/>
+          <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-surface-dim border border-outline-variant/10">
+            ${imageHTML}
           </div>
           <div class="flex-grow">
             <p class="font-bold text-sm text-on-surface">${item.qty}x ${item.name}</p>
             <p class="text-xs text-outline">Preço Unitário: R$ ${item.price.toFixed(2).replace('.', ',')}</p>
           </div>
         </div>
-      `).join('');
+        `;
+      }).join('');
 
       let bannerHTML = '';
       let actionButtonHTML = '';
