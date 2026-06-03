@@ -8,12 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
   let products = [];
   let searchQuery = '';
   let deliveryMethod = 'retirada'; // Default to pickup
-  const deliveryFee = 7.00;
+  const deliveryFee = 4.00;
   
   const storeData = {
     name: "Padaria Lamim",
-    openingTime: "09:00",
-    closingTime: "19:00"
+    openingTime: "06:00",
+    closingTime: "20:00"
   };
 
   const categories = [
