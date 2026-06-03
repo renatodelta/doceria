@@ -64,7 +64,7 @@ h1, h2, h3, .font-serif {
 .store-header {
     position: relative;
     background-color: var(--primary);
-    background-image: linear-gradient(to bottom, rgba(44, 34, 30, 0.65), rgba(29, 28, 13, 0.85)), url('cake_banner_bg.png');
+    background-image: linear-gradient(to bottom, rgba(44, 34, 30, 0.65), rgba(29, 28, 13, 0.85)), url('cake_banner_bg.jpg');
     background-size: cover;
     background-position: center;
     padding: 60px 20px 90px 20px;
