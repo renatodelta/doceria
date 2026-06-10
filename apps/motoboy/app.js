@@ -415,7 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="clay-card rounded-xl overflow-hidden shadow-sm flex flex-col relative">
           <!-- Real Route Google Maps Section -->
           <div class="h-48 w-full bg-surface-container-high relative overflow-hidden rounded-t-xl border-b border-outline-variant/10">
-            <iframe class="w-full h-full border-none grayscale-[0.05] sepia-[0.05]" src="https://maps.google.com/maps?saddr=Padaria+Lamim,+Cruzeiro+SP&daddr=${encodeURIComponent(daddr)}&output=embed" allowfullscreen="" loading="lazy"></iframe>
+            <iframe class="w-full h-full border-none grayscale-[0.05] sepia-[0.05]" src="https://maps.google.com/maps?q=${encodeURIComponent(daddr)}&output=embed" allowfullscreen="" loading="lazy"></iframe>
           </div>
 
           <!-- Card Info -->
