@@ -15,6 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return '../cliente/' + url;
   }
 
+  // --- HELPER TO CLEAN ADDRESS FOR DISPLAY ---
+  function cleanAddressForDisplay(address) {
+    if (!address) return '';
+    return address.split(' | ')[0];
+  }
+
   // --- STATE ---
   let orders = [];
   let products = [];
@@ -366,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const itemsList = order.items || [];
       const itemsSummary = itemsList.map(i => `${i.qty || 1}x ${i.name || 'Item'}`).join(', ');
-      const address = order.clientAddress || 'Retirada na Padaria';
+      const address = cleanAddressForDisplay(order.clientAddress || 'Retirada na Padaria');
 
       let nextButtonHTML = '';
       if (order.status === 'pendente') {
@@ -644,7 +650,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     drawerClientName.textContent = selectedOrder.clientName || 'Cliente';
     drawerClientPhone.textContent = selectedOrder.clientPhone || 'Telefone não informado';
-    drawerClientAddress.textContent = selectedOrder.clientAddress || 'Retirada na Padaria';
+    drawerClientAddress.textContent = cleanAddressForDisplay(selectedOrder.clientAddress || 'Retirada na Padaria');
 
     drawerItemsContainer.innerHTML = '';
     const itemsList = selectedOrder.items || [];

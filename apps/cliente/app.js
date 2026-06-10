@@ -12,6 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
   let maxItemsLimit = 10;
   let whatsappSupportNumber = '5512997531707'; // default WhatsApp
   let storeAddressText = 'Retirada na Padaria';
+
+  // --- HELPERS ---
+  function cleanAddressForDisplay(address) {
+    if (!address) return '';
+    return address.split(' | ')[0];
+  }
   
   let storeData = {
     name: "Padaria Lamim",
@@ -797,7 +803,7 @@ document.addEventListener('DOMContentLoaded', () => {
         address += ` (${complement})`;
       }
       if (gpsCoords) {
-        address += ` | GPS: https://www.google.com/maps/search/?api=1&query=${gpsCoords.lat},${gpsCoords.lon}`;
+        address += ` | Coord: ${gpsCoords.lat},${gpsCoords.lon}`;
       }
     }
     const payment = document.getElementById('input-payment').value;
@@ -951,7 +957,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     successOrderId.textContent = `#${currentOrder.id}`;
     successDeliveryTime.textContent = deliveryMethod === 'delivery' ? '30-45 min' : 'Pronto em 15 min';
-    successAddress.textContent = currentOrder.clientAddress;
+    successAddress.textContent = cleanAddressForDisplay(currentOrder.clientAddress);
     successTotalValue.textContent = `R$ ${currentOrder.total.toFixed(2).replace('.', ',')}`;
 
     successBasketItems.innerHTML = '';
@@ -1143,7 +1149,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Set address and payment info in modal
     if (trackingAddress) {
-      trackingAddress.textContent = isDelivery ? order.client_address : `Retirar em: ${storeAddressText}`;
+      trackingAddress.textContent = isDelivery ? cleanAddressForDisplay(order.client_address) : `Retirar em: ${storeAddressText}`;
     }
     if (trackingPaymentTotal) {
       trackingPaymentTotal.textContent = `R$ ${total.toFixed(2).replace('.', ',')} • ${paymentText}`;

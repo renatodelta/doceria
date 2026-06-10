@@ -1912,28 +1912,31 @@ h1, h2, h3, .font-serif {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    background: rgba(109, 87, 75, 0.08);
-    border: 1px dashed var(--accent);
-    color: var(--accent);
-    padding: 12px;
-    border-radius: 14px;
-    font-size: 0.8rem;
+    gap: 10px;
+    background: linear-gradient(135deg, rgba(109, 87, 75, 0.04) 0%, rgba(125, 86, 45, 0.08) 100%);
+    border: 1px solid rgba(125, 86, 45, 0.25);
+    color: var(--secondary, #7d562d);
+    padding: 14px 20px;
+    border-radius: 16px;
+    font-size: 0.85rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     width: 100%;
     font-family: inherit;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 2px 4px rgba(109, 87, 75, 0.04);
 }
 
 .btn-location-gps:hover {
-    background: rgba(109, 87, 75, 0.15);
-    border-color: var(--primary);
-    color: var(--primary);
+    background: linear-gradient(135deg, rgba(109, 87, 75, 0.08) 0%, rgba(125, 86, 45, 0.14) 100%);
+    border-color: var(--secondary, #7d562d);
+    color: var(--primary, #6d574b);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 12px rgba(125, 86, 45, 0.1);
+    transform: translateY(-1px);
 }
 
 .btn-location-gps:active {
-    transform: scale(0.98);
+    transform: translateY(0) scale(0.98);
 }
 
 .btn-location-gps span {

@@ -15,6 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return '../cliente/' + url;
   }
 
+  // --- HELPER TO CLEAN ADDRESS FOR DISPLAY ---
+  function cleanAddressForDisplay(address) {
+    if (!address) return '';
+    return address.split(' | ')[0];
+  }
+
   // --- CONFIGURATION ---
   let currentRider = '';
   let isOnline = true;
@@ -332,6 +338,12 @@ document.addEventListener('DOMContentLoaded', () => {
     activeOrders.forEach(order => {
       const card = document.createElement('div');
       card.className = "space-y-4";
+
+      let daddr = order.clientAddress;
+      let displayAddress = cleanAddressForDisplay(order.clientAddress);
+      if (order.clientAddress && order.clientAddress.includes(' | Coord: ')) {
+        daddr = order.clientAddress.split(' | Coord: ')[1];
+      }
       
       let notesHTML = '';
       if (order.notes && order.notes.trim()) {
@@ -403,7 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="clay-card rounded-xl overflow-hidden shadow-sm flex flex-col relative">
           <!-- Real Route Google Maps Section -->
           <div class="h-48 w-full bg-surface-container-high relative overflow-hidden rounded-t-xl border-b border-outline-variant/10">
-            <iframe class="w-full h-full border-none grayscale-[0.05] sepia-[0.05]" src="https://maps.google.com/maps?saddr=Padaria+Lamim,+Cruzeiro+SP&daddr=${encodeURIComponent(order.clientAddress)}&output=embed" allowfullscreen="" loading="lazy"></iframe>
+            <iframe class="w-full h-full border-none grayscale-[0.05] sepia-[0.05]" src="https://maps.google.com/maps?saddr=Padaria+Lamim,+Cruzeiro+SP&daddr=${encodeURIComponent(daddr)}&output=embed" allowfullscreen="" loading="lazy"></iframe>
           </div>
 
           <!-- Card Info -->
@@ -424,13 +436,13 @@ document.addEventListener('DOMContentLoaded', () => {
               <div class="flex gap-2">
                 <span class="material-symbols-outlined text-primary text-base mt-0.5">location_on</span>
                 <div>
-                  <p class="text-sm font-semibold text-on-surface">${order.clientAddress}</p>
+                  <p class="text-sm font-semibold text-on-surface">${displayAddress}</p>
                 </div>
               </div>
               
               <div class="flex gap-2 pt-1">
                 <a class="inline-flex items-center gap-1.5 text-secondary font-bold text-[11px] py-1.5 px-3 bg-secondary-container/30 rounded-full hover:bg-secondary-container/50 transition-all active:scale-95 text-decoration-none" 
-                   href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.clientAddress)}" target="_blank">
+                   href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(daddr)}" target="_blank">
                   <span class="material-symbols-outlined text-xs">map</span>
                   <span>Google Maps</span>
                 </a>
