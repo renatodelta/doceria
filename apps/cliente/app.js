@@ -1086,15 +1086,15 @@ document.addEventListener('DOMContentLoaded', () => {
         barStatusText = 'Aceito • Na fila de produção';
         barIconName = 'thumb_up';
         if (step0Desc) step0Desc.textContent = 'Seu pedido foi recebido e aceito pela padaria.';
-        if (step1Desc) step1Desc.textContent = 'Aguardando começar a assar.';
+        if (step1Desc) step1Desc.textContent = 'Aguardando início do preparo.';
         if (step2Desc) step2Desc.textContent = isDelivery ? 'Aguardando despacho.' : 'Aguardando produção.';
         break;
       case 'preparando':
         activeStepIndex = 1;
-        barStatusText = 'Em preparo • No forno';
+        barStatusText = 'Em preparo';
         barIconName = 'oven';
         if (step0Desc) step0Desc.textContent = 'Pedido confirmado e aceito.';
-        if (step1Desc) step1Desc.textContent = 'Seu bolo está sendo assado com carinho no forno a lenha!';
+        if (step1Desc) step1Desc.textContent = 'Seu bolo está sendo preparado com carinho.';
         if (step2Desc) step2Desc.textContent = isDelivery ? 'Aguardando despacho.' : 'Aguardando ficar pronto.';
         break;
       case 'pronto':
