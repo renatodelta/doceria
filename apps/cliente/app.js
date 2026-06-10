@@ -842,6 +842,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
+      // Salvar pedido no localStorage e iniciar rastreamento
+      localStorage.setItem('padaria_lamim_active_order_id', data[0].id);
+      startTracking(data[0].id);
+
       // Render Success elements
       renderSuccessOverlay();
 
@@ -920,6 +924,270 @@ document.addEventListener('DOMContentLoaded', () => {
       loadProductsFromSupabase();
     })
     .subscribe();
+
+  // --- REAL-TIME ORDER TRACKING ---
+  let trackingSubscription = null;
+
+  const trackingFloatingBar = document.getElementById('tracking-floating-bar');
+  const trackingBarOrderId = document.getElementById('tracking-bar-order-id');
+  const trackingBarStatusText = document.getElementById('tracking-bar-status-text');
+  const trackingBarIcon = document.getElementById('tracking-bar-icon');
+  const btnTrackingOpen = document.getElementById('btn-tracking-open');
+
+  const trackingModalOverlay = document.getElementById('tracking-modal-overlay');
+  const btnTrackingCloseModal = document.getElementById('btn-tracking-close-modal');
+  const trackingModalOrderId = document.getElementById('tracking-modal-order-id');
+  const trackingAddress = document.getElementById('tracking-address');
+  const trackingPaymentTotal = document.getElementById('tracking-payment-total');
+  const btnTrackingSupportWhatsapp = document.getElementById('btn-tracking-support-whatsapp');
+  const btnTrackingDismiss = document.getElementById('btn-tracking-dismiss');
+
+  // Event Listeners for Tracking
+  if (btnTrackingOpen) {
+    btnTrackingOpen.onclick = () => {
+      if (trackingModalOverlay) {
+        trackingModalOverlay.classList.add('active');
+      }
+    };
+  }
+
+  if (btnTrackingCloseModal) {
+    btnTrackingCloseModal.onclick = () => {
+      if (trackingModalOverlay) {
+        trackingModalOverlay.classList.remove('active');
+      }
+    };
+  }
+
+  if (btnTrackingDismiss) {
+    btnTrackingDismiss.onclick = () => {
+      // Clear tracking
+      localStorage.removeItem('padaria_lamim_active_order_id');
+      if (trackingFloatingBar) {
+        trackingFloatingBar.classList.remove('active');
+      }
+      if (trackingModalOverlay) {
+        trackingModalOverlay.classList.remove('active');
+      }
+      if (trackingSubscription) {
+        supabaseClient.removeChannel(trackingSubscription);
+        trackingSubscription = null;
+      }
+    };
+  }
+
+  async function startTracking(orderId) {
+    if (!orderId) return;
+
+    try {
+      // Fetch initial order details
+      const { data, error } = await supabaseClient
+        .from('pedidos')
+        .select('*')
+        .eq('id', orderId)
+        .single();
+
+      if (error) throw error;
+      if (!data) {
+        console.warn(`Pedido #${orderId} não encontrado no Supabase.`);
+        localStorage.removeItem('padaria_lamim_active_order_id');
+        return;
+      }
+
+      // Update UI with initial data
+      updateTrackingUI(data);
+
+      // Subscribe to real-time changes
+      if (trackingSubscription) {
+        supabaseClient.removeChannel(trackingSubscription);
+      }
+
+      trackingSubscription = supabaseClient
+        .channel(`order-tracking-${orderId}`)
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'pedidos', filter: `id=eq.${orderId}` },
+          (payload) => {
+            console.log(`Pedido #${orderId} atualizado em tempo real:`, payload.new);
+            updateTrackingUI(payload.new);
+          }
+        )
+        .subscribe();
+
+    } catch (err) {
+      console.error("Erro ao iniciar rastreamento do pedido:", err);
+    }
+  }
+
+  function updateTrackingUI(order) {
+    if (!order) return;
+
+    const orderId = order.id;
+    const status = order.status;
+    const isDelivery = order.client_address !== 'Retirada na Padaria';
+    const total = parseFloat(order.total);
+    const payment = order.payment_method;
+
+    // Map payment names
+    const paymentLabels = {
+      'pix': 'PIX',
+      'cartao_entrega': 'Cartão na Entrega',
+      'dinheiro': 'Dinheiro'
+    };
+    const paymentText = paymentLabels[payment] || payment;
+
+    // Show floating bar
+    if (trackingFloatingBar) {
+      trackingFloatingBar.classList.add('active');
+    }
+
+    // Set order ID in elements
+    if (trackingBarOrderId) trackingBarOrderId.textContent = `#${orderId}`;
+    if (trackingModalOrderId) trackingModalOrderId.textContent = `#${orderId}`;
+
+    // Set address and payment info in modal
+    if (trackingAddress) trackingAddress.textContent = order.client_address;
+    if (trackingPaymentTotal) {
+      trackingPaymentTotal.textContent = `R$ ${total.toFixed(2).replace('.', ',')} • ${paymentText}`;
+    }
+
+    // Set WhatsApp link for support
+    if (btnTrackingSupportWhatsapp) {
+      const whatsappMsg = `Olá, gostaria de informações sobre o meu pedido #${orderId}.`;
+      btnTrackingSupportWhatsapp.href = `https://wa.me/5512997531707?text=${encodeURIComponent(whatsappMsg)}`;
+    }
+
+    // Map status to steps
+    let activeStepIndex = 0;
+    let barStatusText = 'Aguardando confirmação';
+    let barIconName = 'sync';
+
+    // Steps descriptions
+    const step0Desc = document.getElementById('step-0-desc');
+    const step1Desc = document.getElementById('step-1-desc');
+    const step2Title = document.getElementById('step-2-title');
+    const step2Desc = document.getElementById('step-2-desc');
+    const step2Icon = document.getElementById('step-2-icon');
+    const step3Desc = document.getElementById('step-3-desc');
+
+    // Dynamic Step 2 name and icon based on delivery/pickup
+    if (step2Title) {
+      step2Title.textContent = isDelivery ? 'Saiu para Entrega' : 'Pronto para Retirada';
+    }
+    if (step2Icon) {
+      step2Icon.textContent = isDelivery ? 'delivery_dining' : 'storefront';
+    }
+
+    switch (status) {
+      case 'pendente':
+        activeStepIndex = 0;
+        barStatusText = 'Aceito • Na fila de produção';
+        barIconName = 'thumb_up';
+        if (step0Desc) step0Desc.textContent = 'Seu pedido foi recebido e aceito pela padaria.';
+        if (step1Desc) step1Desc.textContent = 'Aguardando começar a assar.';
+        if (step2Desc) step2Desc.textContent = isDelivery ? 'Aguardando despacho.' : 'Aguardando produção.';
+        break;
+      case 'preparando':
+        activeStepIndex = 1;
+        barStatusText = 'Em preparo • No forno';
+        barIconName = 'oven';
+        if (step0Desc) step0Desc.textContent = 'Pedido confirmado e aceito.';
+        if (step1Desc) step1Desc.textContent = 'Seu bolo está sendo assado com carinho no forno a lenha!';
+        if (step2Desc) step2Desc.textContent = isDelivery ? 'Aguardando despacho.' : 'Aguardando ficar pronto.';
+        break;
+      case 'pronto':
+        if (isDelivery) {
+          activeStepIndex = 1; // For delivery, "pronto" still means preparing/waiting for motoboy
+          barStatusText = 'Preparado • Aguardando entregador';
+          barIconName = 'oven';
+          if (step1Desc) step1Desc.textContent = 'Bolo pronto e embalado! Aguardando o entregador coletar.';
+          if (step2Desc) step2Desc.textContent = 'Aguardando o motoboy iniciar a rota.';
+        } else {
+          activeStepIndex = 2; // For pickup, "pronto" means it's ready to pick up (Step 3 active)
+          barStatusText = 'Pronto para Retirada!';
+          barIconName = 'storefront';
+          if (step1Desc) step1Desc.textContent = 'Bolo pronto e embalado!';
+          if (step2Desc) step2Desc.textContent = 'Seu pedido já está no balcão. Pode vir buscar!';
+        }
+        break;
+      case 'a_caminho':
+      case 'aceito_motoboy':
+        activeStepIndex = 2;
+        barStatusText = 'Saiu para Entrega!';
+        barIconName = 'delivery_dining';
+        if (step1Desc) step1Desc.textContent = 'Bolo pronto e embalado.';
+        if (step2Desc) {
+          step2Desc.textContent = status === 'aceito_motoboy' 
+            ? 'O motoboy aceitou a corrida e já está a caminho!' 
+            : 'O entregador iniciou a rota de entrega!';
+        }
+        break;
+      case 'entregue':
+        activeStepIndex = 3;
+        barStatusText = 'Pedido Concluído! 🎉';
+        barIconName = 'celebration';
+        if (step0Desc) step0Desc.textContent = 'Pedido aceito e confirmado.';
+        if (step1Desc) step1Desc.textContent = 'Bolo produzido com carinho.';
+        if (step2Desc) step2Desc.textContent = isDelivery ? 'Entregue no seu endereço.' : 'Retirado com sucesso na loja.';
+        if (step3Desc) step3Desc.textContent = 'Entregue e quentinho! Obrigado pela preferência e bom apetite! 🍰';
+        break;
+    }
+
+    // Update floating bar status text and icon
+    if (trackingBarStatusText) {
+      trackingBarStatusText.textContent = barStatusText;
+      if (status === 'entregue') {
+        trackingBarStatusText.classList.add('completed');
+      } else {
+        trackingBarStatusText.classList.remove('completed');
+      }
+    }
+    if (trackingBarIcon) {
+      trackingBarIcon.textContent = barIconName;
+      if (status === 'entregue') {
+        trackingBarIcon.parentElement.classList.add('completed');
+      } else {
+        trackingBarIcon.parentElement.classList.remove('completed');
+      }
+    }
+
+    // Update Stepper item classes
+    for (let i = 0; i <= 3; i++) {
+      const stepItem = document.getElementById(`step-${i}`);
+      if (stepItem) {
+        stepItem.classList.remove('active', 'completed');
+        if (i < activeStepIndex) {
+          stepItem.classList.add('completed');
+        } else if (i === activeStepIndex) {
+          if (status === 'entregue') {
+            stepItem.classList.add('completed');
+          } else {
+            stepItem.classList.add('active');
+          }
+        }
+      }
+    }
+
+    // Toggle close button / support buttons
+    if (status === 'entregue') {
+      if (btnTrackingDismiss) btnTrackingDismiss.classList.remove('hidden');
+      if (btnTrackingSupportWhatsapp) btnTrackingSupportWhatsapp.classList.add('hidden');
+      if (btnTrackingCloseModal) btnTrackingCloseModal.classList.add('hidden');
+    } else {
+      if (btnTrackingDismiss) btnTrackingDismiss.classList.add('hidden');
+      if (btnTrackingSupportWhatsapp) btnTrackingSupportWhatsapp.classList.remove('hidden');
+      if (btnTrackingCloseModal) btnTrackingCloseModal.classList.remove('hidden');
+    }
+  }
+
+  function initOrderTracking() {
+    const activeOrderId = localStorage.getItem('padaria_lamim_active_order_id');
+    if (activeOrderId) {
+      console.log("Rastreando pedido ativo encontrado no localStorage:", activeOrderId);
+      startTracking(activeOrderId);
+    }
+  }
+
   // --- PWA INSTALLATION LOGIC ---
   let deferredPrompt;
   const installBanner = document.getElementById('install-banner');
@@ -989,6 +1257,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCartUI();
   toggleAddress();
   toggleNotes();
+  initOrderTracking();
 
   // Update status every minute
   setInterval(checkStoreStatus, 60000);

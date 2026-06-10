@@ -70,7 +70,7 @@
         </div>
         <div class="opening-details">
           <span class="opening-hours">
-            🕒 Seg a Dom: 08:00 às 19:00
+            🕒 Seg a Dom: 06:00 às 20:00
           </span>
         </div>
       </div>
@@ -326,6 +326,126 @@
         <button class="btn-success-back" id="btn-success-back">
           <span>Voltar para a Loja</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Order Tracking Bar -->
+  <div id="tracking-floating-bar" class="tracking-floating-bar hidden">
+    <div class="tracking-bar-content">
+      <div class="tracking-bar-left">
+        <div class="tracking-bar-icon-bg animate-pulse-gold">
+          <span class="material-symbols-outlined" id="tracking-bar-icon">sync</span>
+        </div>
+        <div class="tracking-bar-info">
+          <span class="tracking-bar-label">Acompanhar Pedido <strong id="tracking-bar-order-id">#0000</strong></span>
+          <span class="tracking-bar-status" id="tracking-bar-status-text">Carregando status...</span>
+        </div>
+      </div>
+      <button class="btn-tracking-open" id="btn-tracking-open">
+        <span>Ver Detalhes</span>
+        <span class="material-symbols-outlined">arrow_forward_ios</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Order Tracking Modal Overlay -->
+  <div class="tracking-overlay" id="tracking-modal-overlay">
+    <div class="tracking-modal-container">
+      <div class="tracking-modal-header">
+        <button class="btn-tracking-close-modal" id="btn-tracking-close-modal">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+        <div class="tracking-avatar-container">
+          <div class="tracking-avatar-bg"></div>
+          <div class="tracking-avatar-circle">
+            <img src="bolos_lamim1.jpeg" alt="Logo Padaria" />
+          </div>
+          <div class="tracking-pulse-badge">
+            <span class="material-symbols-outlined" style="font-size: 16px;">sync</span>
+          </div>
+        </div>
+        <h2 class="tracking-modal-title">Acompanhar Pedido <span id="tracking-modal-order-id">#0000</span></h2>
+        <p class="tracking-modal-subtitle">Veja o status da sua fornada em tempo real</p>
+      </div>
+
+      <!-- Stepper Progress Tracker -->
+      <div class="tracking-stepper-container">
+        <!-- Vertical Stepper -->
+        <div class="tracking-stepper">
+          <!-- Step 1 -->
+          <div class="step-item" id="step-0">
+            <div class="step-icon-container">
+              <span class="material-symbols-outlined">thumb_up</span>
+            </div>
+            <div class="step-text-container">
+              <p class="step-title">Pedido Aceito</p>
+              <p class="step-desc" id="step-0-desc">Seu pedido foi recebido e aceito pela padaria.</p>
+            </div>
+          </div>
+          <!-- Step 2 -->
+          <div class="step-item" id="step-1">
+            <div class="step-icon-container">
+              <span class="material-symbols-outlined">oven</span>
+            </div>
+            <div class="step-text-container">
+              <p class="step-title">Em Preparo</p>
+              <p class="step-desc" id="step-1-desc">Seu bolo está sendo feito com carinho.</p>
+            </div>
+          </div>
+          <!-- Step 3 -->
+          <div class="step-item" id="step-2">
+            <div class="step-icon-container">
+              <span class="material-symbols-outlined" id="step-2-icon">delivery_dining</span>
+            </div>
+            <div class="step-text-container">
+              <p class="step-title" id="step-2-title">Saiu para Entrega</p>
+              <p class="step-desc" id="step-2-desc">A caminho do seu endereço.</p>
+            </div>
+          </div>
+          <!-- Step 4 -->
+          <div class="step-item" id="step-3">
+            <div class="step-icon-container">
+              <span class="material-symbols-outlined">celebration</span>
+            </div>
+            <div class="step-text-container">
+              <p class="step-title">Pedido Concluído</p>
+              <p class="step-desc" id="step-3-desc">Entregue e quentinho!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Card: Delivery Address / Contact Support -->
+      <div class="tracking-modal-details">
+        <div class="tracking-info-card">
+          <div class="tracking-info-item">
+            <span class="material-symbols-outlined">location_on</span>
+            <div>
+              <p class="tracking-info-meta">Local de Entrega / Retirada</p>
+              <p class="tracking-info-value" id="tracking-address">Retirada na Padaria</p>
+            </div>
+          </div>
+          <div class="tracking-info-item">
+            <span class="material-symbols-outlined">payments</span>
+            <div>
+              <p class="tracking-info-meta">Total & Pagamento</p>
+              <p class="tracking-info-value" id="tracking-payment-total">R$ 0,00 • Dinheiro</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tracking-actions">
+          <a href="#" target="_blank" class="btn-tracking-whatsapp" id="btn-tracking-support-whatsapp">
+            <svg viewBox="0 0 24 24" width="20" height="20" style="display:inline-block; vertical-align:middle; margin-right:6px; fill:currentColor;">
+              <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.438 2.5 1.177 3.462l-.77 2.817 2.894-.759c.928.63 2.043.999 3.242 1 3.18.001 5.767-2.585 5.768-5.766 0-3.18-2.586-5.766-5.766-5.766zm3.398 8.163c-.15.424-.766.772-1.054.814-.275.04-.633.063-1.025-.062-.24-.076-.543-.163-.918-.325-1.579-.685-2.578-2.3-2.658-2.408-.079-.108-.667-.887-.667-1.692 0-.806.42-1.2.569-1.354.15-.153.33-.229.438-.229.11 0 .22.002.316.006.103.004.241-.038.378.293.136.33.468 1.139.51 1.224.041.085.068.184.013.293-.055.11-.112.18-.182.261-.07.081-.148.18-.211.242-.07.067-.142.14-.061.28.081.136.36 1.055.772 1.42.53.47 1.01.62 1.15.688.14.07.22.06.3-.03.08-.09.34-.396.43-.532.09-.136.18-.113.3-.07.12.044.766.362.897.427.13.066.218.098.25.152.032.054.032.31-.118.734zM12 2C6.48 2 2 6.48 2 12c0 1.95.56 3.77 1.52 5.31L2 22l4.83-1.47C8.32 21.41 10.1 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.63 0-3.16-.48-4.45-1.31l-.32-.21-2.92.89.9-2.79-.23-.36C4.16 14.9 3.6 13.52 3.6 12c0-4.63 3.77-8.4 8.4-8.4 4.63 0 8.4 3.77 8.4 8.4s-3.77 8.4-8.4 8.4z"/>
+            </svg>
+            <span>Falar com a Padaria no WhatsApp</span>
+          </a>
+          <button class="btn-tracking-dismiss btn-primary" id="btn-tracking-dismiss">
+            <span>Concluir e fechar</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
