@@ -79,7 +79,20 @@ self.addEventListener('fetch', (e) => {
       }).catch((err) => {
         // Fallback em caso de falha de rede/offline
         if (e.request.mode === 'navigate') {
-          return caches.match('./index.html') || caches.match('./');
+          return caches.match('./index.html').then((res) => {
+            if (res) return res;
+            return caches.match('./').then((resDir) => {
+              if (resDir) return resDir;
+              return new Response(
+                "<!DOCTYPE html><html lang='pt-BR'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Offline</title><style>body{font-family:sans-serif;text-align:center;padding:50px;background:#fefae0;color:#1d1c0d}h1{color:#6d574b}p{color:#4f4540}</style></head><body><h1>Sem Conexão</h1><p>Conecte-se à internet para carregar o aplicativo.</p></body></html>",
+                {
+                  status: 503,
+                  statusText: "Service Unavailable",
+                  headers: new Headers({ 'Content-Type': 'text/html; charset=utf-8' })
+                }
+              );
+            });
+          });
         }
         throw err;
       });
