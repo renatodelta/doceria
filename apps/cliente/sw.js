@@ -1,4 +1,4 @@
-const CACHE_NAME = 'padaria-lamim-cliente-cache-v2';
+const CACHE_NAME = 'padaria-lamim-cliente-cache-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -37,51 +37,48 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  // Interceptar apenas requisições GET e esquemas http/https
-  if (e.request.method !== 'GET' || !e.request.url.startsWith('http')) {
+  // Apenas requisições GET
+  if (e.request.method !== 'GET') {
     return;
   }
 
-  // Ignorar requisições ao Supabase e provedores de mapas para garantir dados em tempo real
-  if (
-    e.request.url.includes('supabase.co') ||
-    e.request.url.includes('nominatim.openstreetmap.org') ||
-    e.request.url.includes('maps.google.com')
-  ) {
+  const url = new URL(e.request.url);
+
+  // Apenas interceptar requisições para a nossa própria origem (mesmo domínio)
+  if (url.origin !== self.location.origin) {
     return;
   }
 
-  // Evitar problemas com requisições only-if-cached que não sejam same-origin
-  if (e.request.cache === 'only-if-cached' && e.request.mode !== 'same-origin') {
+  // Interceptar navegação principal ou arquivos estáticos listados nos ASSETS
+  const isNavigation = e.request.mode === 'navigate';
+  const isAsset = ASSETS.some(asset => {
+    const assetPath = asset.startsWith('.') ? asset.slice(1) : asset;
+    return url.pathname === assetPath || 
+           (url.pathname === '/' && assetPath === '/index.html') || 
+           url.pathname.endsWith(assetPath);
+  });
+
+  if (!isNavigation && !isAsset) {
     return;
   }
 
   e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // stale-while-revalidate: atualiza cache no background com clone do response
-        fetch(e.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, responseToCache));
-          }
-        }).catch(() => {});
-        return cachedResponse;
-      }
-      
-      return fetch(e.request).then((networkResponse) => {
-        // Se a resposta for válida, cachear para o futuro
+    caches.match(e.request, { ignoreSearch: true }).then((cachedResponse) => {
+      // Cria a promessa de busca na rede para atualizar o cache
+      const fetchPromise = fetch(e.request).then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(e.request, responseToCache));
         }
         return networkResponse;
       }).catch((err) => {
-        // Fallback em caso de falha de rede/offline
-        if (e.request.mode === 'navigate') {
-          return caches.match('./index.html').then((res) => {
+        if (cachedResponse) return cachedResponse;
+        
+        // Se falhar rede e não estiver cacheado, retornar fallback
+        if (isNavigation) {
+          return caches.match('./index.html', { ignoreSearch: true }).then((res) => {
             if (res) return res;
-            return caches.match('./').then((resDir) => {
+            return caches.match('./', { ignoreSearch: true }).then((resDir) => {
               if (resDir) return resDir;
               return new Response(
                 "<!DOCTYPE html><html lang='pt-BR'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Offline</title><style>body{font-family:sans-serif;text-align:center;padding:50px;background:#fefae0;color:#1d1c0d}h1{color:#6d574b}p{color:#4f4540}</style></head><body><h1>Sem Conexão</h1><p>Conecte-se à internet para carregar o aplicativo.</p></body></html>",
@@ -96,6 +93,8 @@ self.addEventListener('fetch', (e) => {
         }
         throw err;
       });
+
+      return cachedResponse || fetchPromise;
     })
   );
 });
