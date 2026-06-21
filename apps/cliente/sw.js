@@ -1,4 +1,4 @@
-const CACHE_NAME = 'padaria-lamim-cliente-cache-v4';
+const CACHE_NAME = 'padaria-lamim-cliente-cache-v5';
 const ASSETS = [
   './',
   './index.html',

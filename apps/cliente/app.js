@@ -1086,12 +1086,17 @@ document.addEventListener('DOMContentLoaded', () => {
         .from('pedidos')
         .select('*')
         .eq('id', orderId)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
-      if (!data) {
-        console.warn(`Pedido #${orderId} não encontrado no Supabase.`);
-        localStorage.removeItem('padaria_lamim_active_order_id');
+      if (error || !data) {
+        console.warn(`Pedido #${orderId} não encontrado no Supabase (recusado ou removido).`);
+        updateTrackingUI({
+          id: orderId,
+          status: 'recusado',
+          client_address: 'Retirada na Padaria',
+          total: 0,
+          payment_method: 'pix'
+        });
         return;
       }
 
@@ -1107,10 +1112,20 @@ document.addEventListener('DOMContentLoaded', () => {
         .channel(`order-tracking-${orderId}`)
         .on(
           'postgres_changes',
-          { event: 'UPDATE', schema: 'public', table: 'pedidos', filter: `id=eq.${orderId}` },
+          { event: '*', schema: 'public', table: 'pedidos', filter: `id=eq.${orderId}` },
           (payload) => {
-            console.log(`Pedido #${orderId} atualizado em tempo real:`, payload.new);
-            updateTrackingUI(payload.new);
+            console.log(`Pedido #${orderId} alterado em tempo real:`, payload);
+            if (payload.eventType === 'DELETE') {
+              updateTrackingUI({
+                id: orderId,
+                status: 'recusado',
+                client_address: 'Retirada na Padaria',
+                total: 0,
+                payment_method: 'pix'
+              });
+            } else if (payload.new) {
+              updateTrackingUI(payload.new);
+            }
           }
         )
         .subscribe();
