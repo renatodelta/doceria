@@ -1248,6 +1248,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (status === 'recusado') {
       if (stepperContainer) stepperContainer.classList.add('hidden');
       if (refusedContainer) refusedContainer.classList.remove('hidden');
+      if (trackingModalOverlay) trackingModalOverlay.classList.add('active');
     } else {
       if (stepperContainer) stepperContainer.classList.remove('hidden');
       if (refusedContainer) refusedContainer.classList.add('hidden');
