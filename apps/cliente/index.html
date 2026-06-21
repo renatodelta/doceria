@@ -378,7 +378,7 @@
       </div>
 
       <!-- Stepper Progress Tracker -->
-      <div class="tracking-stepper-container">
+      <div class="tracking-stepper-container" id="tracking-stepper-container">
         <!-- Vertical Stepper -->
         <div class="tracking-stepper">
           <!-- Step 1 -->
@@ -422,6 +422,20 @@
             </div>
           </div>
         </div>
+      </div>
+      
+      <!-- Refused Order Message (Hidden by default) -->
+      <div id="tracking-refused-container" class="hidden" style="padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px; background: rgba(109, 87, 75, 0.03); border-radius: 16px; border: 1px dashed rgba(186, 26, 26, 0.2); margin: 0 16px 20px 16px;">
+        <div style="background: rgba(186, 26, 26, 0.1); color: var(--danger); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(186, 26, 26, 0.1);">
+          <span class="material-symbols-outlined" style="font-size: 36px; font-weight: 700;">cancel</span>
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); font-family: var(--font-display); margin: 0;">Pedido Não Aceito</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; max-width: 290px; margin: 0 auto;">
+          Infelizmente, a padaria não pôde aceitar seu pedido neste momento. Pedimos desculpas pelo inconveniente!
+        </p>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; max-width: 290px; margin: 0 auto; font-weight: 500;">
+          Nenhum valor foi cobrado. Se precisar de esclarecimentos ou quiser fazer alguma alteração, por favor fale conosco no WhatsApp.
+        </p>
       </div>
 
       <!-- Info Card: Delivery Address / Contact Support -->

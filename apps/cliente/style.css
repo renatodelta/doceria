@@ -1467,6 +1467,10 @@ h1, h2, h3, .font-serif {
     background: var(--success);
 }
 
+.tracking-bar-icon-bg.refused {
+    background: var(--danger);
+}
+
 .tracking-bar-icon-bg span {
     font-size: 20px;
 }
@@ -1501,6 +1505,10 @@ h1, h2, h3, .font-serif {
 
 .tracking-bar-status.completed {
     color: var(--success);
+}
+
+.tracking-bar-status.refused {
+    color: var(--danger);
 }
 
 .btn-tracking-open {

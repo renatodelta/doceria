@@ -764,18 +764,18 @@ document.addEventListener('DOMContentLoaded', () => {
     btnCancel.className = "px-4 py-3 bg-surface-container border border-error/20 text-error rounded-xl font-bold text-sm hover:bg-error-container/20 transition-all active:scale-95 cursor-pointer";
     btnCancel.textContent = "Recusar";
     btnCancel.onclick = async () => {
-      if (confirm(`Deseja realmente recusar e remover o Pedido #${selectedOrder.id}?`)) {
+      if (confirm(`Deseja realmente recusar o Pedido #${selectedOrder.id}?`)) {
         try {
           const { error } = await supabaseClient
             .from('pedidos')
-            .delete()
+            .update({ status: 'recusado' })
             .eq('id', selectedOrder.id);
 
           if (error) throw error;
           await loadDashboardData();
           closeDrawer();
         } catch (err) {
-          console.error("Erro ao deletar pedido no Supabase:", err);
+          console.error("Erro ao recusar pedido no Supabase:", err);
         }
       }
     };

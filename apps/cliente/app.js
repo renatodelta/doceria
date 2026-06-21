@@ -1235,23 +1235,43 @@ document.addEventListener('DOMContentLoaded', () => {
         if (step2Desc) step2Desc.textContent = isDelivery ? 'Entregue no seu endereço.' : 'Retirado com sucesso na loja.';
         if (step3Desc) step3Desc.textContent = 'Entregue e quentinho! Obrigado pela preferência e bom apetite! 🍰';
         break;
+      case 'recusado':
+        activeStepIndex = -1;
+        barStatusText = 'Pedido não aceito 😢';
+        barIconName = 'cancel';
+        break;
+    }
+
+    // Toggle stepper vs refused container
+    const stepperContainer = document.getElementById('tracking-stepper-container');
+    const refusedContainer = document.getElementById('tracking-refused-container');
+    if (status === 'recusado') {
+      if (stepperContainer) stepperContainer.classList.add('hidden');
+      if (refusedContainer) refusedContainer.classList.remove('hidden');
+    } else {
+      if (stepperContainer) stepperContainer.classList.remove('hidden');
+      if (refusedContainer) refusedContainer.classList.add('hidden');
     }
 
     // Update floating bar status text and icon
     if (trackingBarStatusText) {
       trackingBarStatusText.textContent = barStatusText;
+      trackingBarStatusText.classList.remove('completed', 'refused');
       if (status === 'entregue') {
         trackingBarStatusText.classList.add('completed');
-      } else {
-        trackingBarStatusText.classList.remove('completed');
+      } else if (status === 'recusado') {
+        trackingBarStatusText.classList.add('refused');
       }
     }
     if (trackingBarIcon) {
       trackingBarIcon.textContent = barIconName;
-      if (status === 'entregue') {
-        trackingBarIcon.parentElement.classList.add('completed');
-      } else {
-        trackingBarIcon.parentElement.classList.remove('completed');
+      if (trackingBarIcon.parentElement) {
+        trackingBarIcon.parentElement.classList.remove('completed', 'refused');
+        if (status === 'entregue') {
+          trackingBarIcon.parentElement.classList.add('completed');
+        } else if (status === 'recusado') {
+          trackingBarIcon.parentElement.classList.add('refused');
+        }
       }
     }
 
@@ -1273,10 +1293,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Toggle close button / support buttons
-    if (status === 'entregue') {
-      if (btnTrackingDismiss) btnTrackingDismiss.classList.remove('hidden');
-      if (btnTrackingSupportWhatsapp) btnTrackingSupportWhatsapp.classList.add('hidden');
-      if (btnTrackingCloseModal) btnTrackingCloseModal.classList.add('hidden');
+    if (status === 'entregue' || status === 'recusado') {
+      if (btnTrackingDismiss) {
+        btnTrackingDismiss.classList.remove('hidden');
+        const btnTextSpan = btnTrackingDismiss.querySelector('span');
+        if (btnTextSpan) {
+          btnTextSpan.textContent = status === 'recusado' ? 'Entendido' : 'Concluir e fechar';
+        }
+      }
+      if (btnTrackingSupportWhatsapp) {
+        if (status === 'recusado') {
+          btnTrackingSupportWhatsapp.classList.remove('hidden');
+        } else {
+          btnTrackingSupportWhatsapp.classList.add('hidden');
+        }
+      }
+      if (btnTrackingCloseModal) {
+        if (status === 'recusado') {
+          btnTrackingCloseModal.classList.remove('hidden');
+        } else {
+          btnTrackingCloseModal.classList.add('hidden');
+        }
+      }
     } else {
       if (btnTrackingDismiss) btnTrackingDismiss.classList.add('hidden');
       if (btnTrackingSupportWhatsapp) btnTrackingSupportWhatsapp.classList.remove('hidden');
