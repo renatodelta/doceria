@@ -31,6 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let activeMobileColumn = 'pending'; // 'pending', 'preparing', 'ready', 'delivery'
   let soundEnabled = localStorage.getItem('dashboard_sound_alerts') !== 'disabled';
   let soundInterval = null;
+  let sirenOscillator = null;
+  let sirenLFO = null;
+  let sirenGain = null;
 
   // --- UI ELEMENTS ---
   const listPending = document.getElementById('list-pending');
@@ -1599,26 +1602,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function startContinuousSiren(volume) {
+    stopContinuousSiren();
+    blessAudio();
+    if (!audioCtx) return;
+    
+    const ctx = audioCtx;
+    
+    sirenOscillator = ctx.createOscillator();
+    sirenOscillator.type = 'sawtooth';
+    sirenOscillator.frequency.value = 800;
+    
+    sirenLFO = ctx.createOscillator();
+    sirenLFO.type = 'sine';
+    sirenLFO.frequency.value = 2;
+    
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = 250;
+    
+    sirenLFO.connect(lfoGain);
+    lfoGain.connect(sirenOscillator.frequency);
+    
+    sirenGain = ctx.createGain();
+    sirenGain.gain.setValueAtTime(0, ctx.currentTime);
+    sirenGain.gain.linearRampToValueAtTime(volume * 0.15, ctx.currentTime + 0.1);
+    
+    sirenOscillator.connect(sirenGain);
+    sirenGain.connect(ctx.destination);
+    
+    sirenLFO.start();
+    sirenOscillator.start();
+  }
+
+  function stopContinuousSiren() {
+    if (sirenOscillator) {
+      try { sirenOscillator.stop(); } catch(e){}
+      sirenOscillator = null;
+    }
+    if (sirenLFO) {
+      try { sirenLFO.stop(); } catch(e){}
+      sirenLFO = null;
+    }
+    if (sirenGain) {
+      sirenGain = null;
+    }
+  }
+
   function playNewOrderSound() {
     if (!soundEnabled) return;
     
     stopNewOrderAlert();
     
-    let ringCount = 0;
-    const maxRings = 15;
-    
-    const ring = () => {
-      if (!soundEnabled || ringCount >= maxRings) {
-        stopNewOrderAlert();
-        return;
-      }
+    if (activeChimeType === 'siren') {
+      startContinuousSiren(activeVolume);
+    } else {
+      let ringCount = 0;
+      const maxRings = 15;
       
-      playChime(activeChimeType, activeVolume);
-      ringCount++;
-    };
-    
-    ring();
-    soundInterval = setInterval(ring, activeChimeType === 'siren' ? 1500 : 3000);
+      const ring = () => {
+        if (!soundEnabled || ringCount >= maxRings) {
+          stopNewOrderAlert();
+          return;
+        }
+        
+        playChime(activeChimeType, activeVolume);
+        ringCount++;
+      };
+      
+      ring();
+      soundInterval = setInterval(ring, 3000);
+    }
   }
 
   function stopNewOrderAlert() {
@@ -1626,6 +1679,7 @@ document.addEventListener('DOMContentLoaded', () => {
       clearInterval(soundInterval);
       soundInterval = null;
     }
+    stopContinuousSiren();
   }
 
   function updateSoundButtonUI() {

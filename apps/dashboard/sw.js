@@ -1,4 +1,4 @@
-const CACHE_NAME = 'padaria-lamim-dashboard-cache-v4';
+const CACHE_NAME = 'padaria-lamim-dashboard-cache-v5';
 const ASSETS = [
   './',
   './index.html',

@@ -1233,16 +1233,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         break;
       case 'a_caminho':
+        activeStepIndex = 2;
+        barStatusText = 'Aguardando Entregador';
+        barIconName = 'delivery_dining';
+        if (step1Desc) step1Desc.textContent = 'Bolo pronto e embalado.';
+        if (step2Desc) step2Desc.textContent = 'Pedido despachado! Aguardando o entregador aceitar a corrida.';
+        break;
       case 'aceito_motoboy':
         activeStepIndex = 2;
         barStatusText = 'Saiu para Entrega!';
         barIconName = 'delivery_dining';
         if (step1Desc) step1Desc.textContent = 'Bolo pronto e embalado.';
-        if (step2Desc) {
-          step2Desc.textContent = status === 'aceito_motoboy' 
-            ? 'O motoboy aceitou a corrida e já está a caminho!' 
-            : 'O entregador iniciou a rota de entrega!';
-        }
+        if (step2Desc) step2Desc.textContent = 'O entregador iniciou a rota de entrega!';
         break;
       case 'entregue':
         activeStepIndex = 3;
