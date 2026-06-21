@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let sirenOscillator = null;
   let sirenLFO = null;
   let sirenGain = null;
-  let newOrderAudio = new Audio('Brasil.m4a');
+  let newOrderAudio = new Audio('Brasil.mp3');
 
   // --- UI ELEMENTS ---
   const listPending = document.getElementById('list-pending');
@@ -1510,9 +1510,9 @@ document.addEventListener('DOMContentLoaded', () => {
     blessAudio();
     
     if (type === 'siren') {
-      const tempAudio = new Audio('Brasil.m4a');
+      const tempAudio = new Audio('Brasil.mp3');
       tempAudio.volume = volume;
-      tempAudio.play().catch(err => console.error("Error playing test Brasil.m4a:", err));
+      tempAudio.play().catch(err => console.error("Error playing test Brasil.mp3:", err));
       return;
     }
     

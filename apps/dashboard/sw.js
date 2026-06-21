@@ -1,4 +1,4 @@
-const CACHE_NAME = 'padaria-lamim-dashboard-cache-v6';
+const CACHE_NAME = 'padaria-lamim-dashboard-cache-v7';
 const ASSETS = [
    './',
    './index.html',
@@ -8,7 +8,7 @@ const ASSETS = [
    './manifest.json',
    './icon-192.png',
    './icon-512.png',
-   './Brasil.m4a'
+   './Brasil.mp3'
 ];
 
 self.addEventListener('install', (e) => {
