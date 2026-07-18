@@ -1,22 +1,22 @@
 /* ==========================================================================
-   PADARIA LAMIM - Elegant Artisanal Hearth Design
+   DOCE MAGIA - Elegant Gourmet Dessert Design
    ========================================================================== */
 
 :root {
-    --primary: #6d574b;          /* Cocoa Brown */
-    --primary-light: #877063;
-    --accent: #7d562d;           /* Toasted Gold */
-    --accent-light: #ffca98;
-    --bg-color: #fefae0;         /* Soft Cream */
+    --primary: #892b45;          /* Berry Red / Cereja Escura */
+    --primary-light: #a3304c;
+    --accent: #cca86c;           /* Toasted Gold / Doce de Leite */
+    --accent-light: #f2bdbe;     /* Cupcake Pink */
+    --bg-color: #f7f4ec;         /* Vanilla Cream */
     --card-bg: #ffffff;
-    --text-main: #1d1c0d;        /* Dark Cocoa */
-    --text-muted: #4f4540;       /* Muted Cocoa */
-    --success: #5a5e43;          /* Sage Green */
-    --success-hover: #484b36;
+    --text-main: #3c1b22;        /* Dark Cocoa Cherry */
+    --text-muted: #6b5a5c;       /* Muted Cocoa */
+    --success: #8fbca0;          /* Sage Mint Green */
+    --success-hover: #76a589;
     --danger: #ba1a1a;
-    --border: #d2c4bd;
-    --border-light: rgba(139, 115, 102, 0.15);
-    --shadow: 0 10px 30px rgba(109, 87, 75, 0.08), 0 4px 8px rgba(109, 87, 75, 0.04);
+    --border: #e8dfd8;
+    --border-light: rgba(137, 43, 69, 0.08);
+    --shadow: 0 12px 35px rgba(137, 43, 69, 0.06), 0 4px 10px rgba(137, 43, 69, 0.03);
     --border-radius: 20px;
 }
 
@@ -30,8 +30,8 @@ body {
     font-family: 'Be Vietnam Pro', sans-serif;
     background-color: var(--bg-color);
     background-image:
-        repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(139, 115, 102, 0.02) 50px, rgba(139, 115, 102, 0.02) 100px),
-        linear-gradient(rgba(254, 250, 224, 0.95), rgba(254, 250, 224, 0.95));
+        repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(137, 43, 69, 0.015) 50px, rgba(137, 43, 69, 0.015) 100px),
+        linear-gradient(rgba(247, 244, 236, 0.95), rgba(247, 244, 236, 0.95));
     color: var(--text-main);
     line-height: 1.5;
     padding-bottom: 90px; /* Space for mobile floating cart */
@@ -124,7 +124,7 @@ h1, h2, h3, .font-serif {
     height: 100%;
     object-fit: cover;
     display: block;
-    transform: scale(1.55);
+    transform: scale(1.0);
     transform-origin: center center;
 }
 

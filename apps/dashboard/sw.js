@@ -1,4 +1,4 @@
-const CACHE_NAME = 'padaria-lamim-dashboard-cache-v7';
+const CACHE_NAME = 'doce-magia-dashboard-cache-v7';
 const ASSETS = [
    './',
    './index.html',
@@ -104,7 +104,7 @@ self.addEventListener('push', (event) => {
 
   const title = data.title || 'Novo Pedido Recebido!';
   const options = {
-    body: data.body || 'Toque para gerenciar o novo pedido da Padaria Lamim.',
+    body: data.body || 'Toque para gerenciar o novo pedido da Doce Magia.',
     icon: 'icon-192.png',
     badge: 'icon-192.png',
     vibrate: [300, 100, 300, 100, 300],

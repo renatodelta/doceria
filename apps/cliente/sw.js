@@ -1,4 +1,4 @@
-const CACHE_NAME = 'padaria-lamim-cliente-cache-v7';
+const CACHE_NAME = 'doce-magia-cliente-cache-v7';
 const ASSETS = [
   './',
   './index.html',
@@ -81,7 +81,7 @@ self.addEventListener('fetch', (e) => {
             return caches.match('./', { ignoreSearch: true }).then((resDir) => {
               if (resDir) return resDir;
               return new Response(
-                "<!DOCTYPE html><html lang='pt-BR'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Offline</title><style>body{font-family:sans-serif;text-align:center;padding:50px;background:#fefae0;color:#1d1c0d}h1{color:#6d574b}p{color:#4f4540}</style></head><body><h1>Sem Conexão</h1><p>Conecte-se à internet para carregar o aplicativo.</p></body></html>",
+                "<!DOCTYPE html><html lang='pt-BR'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Offline</title><style>body{font-family:sans-serif;text-align:center;padding:50px;background:#f7f4ec;color:#3c1b22}h1{color:#892b45}p{color:#6b5a5c}</style></head><body><h1>Sem Conexão</h1><p>Conecte-se à internet para carregar o aplicativo.</p></body></html>",
                 {
                   status: 503,
                   statusText: "Service Unavailable",

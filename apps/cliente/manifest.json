@@ -1,7 +1,7 @@
 {
-  "name": "Padaria Lamim",
-  "short_name": "Lamim",
-  "description": "Encomende pães e bolos artesanais frescos da Padaria Lamim.",
+  "name": "Doce Magia",
+  "short_name": "Doce Magia",
+  "description": "Encomende doces e bolos artesanais frescos da Doce Magia.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fefae0",

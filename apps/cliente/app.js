@@ -1,5 +1,5 @@
 /* ==========================================================================
-   PADARIA LAMIM - Cliente App Logic (Layout inspired by Recanto Formoso)
+   DOCE MAGIA - Cliente App Logic
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -20,13 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   let storeData = {
-    name: "Padaria Lamim",
+    name: "Doce Magia",
     openingTime: "06:00",
     closingTime: "20:00"
   };
 
   const categories = [
-    { id: 'bolos', name: '🍰 Bolos Caseiros' }
+    { id: 'bolos', name: '🍰 Bolos & Tortas' },
+    { id: 'docinhos', name: '🧁 Docinhos & Cupcakes' }
   ];
 
   // --- MOCK PRODUCT DATABASE ---
@@ -128,6 +129,33 @@ document.addEventListener('DOMContentLoaded', () => {
       desc: 'Massa mesclada branca e preta, coberta com brigadeiro branco e preto — combinando sabor e charme em cada fatia. Delicioso e sem conservantes, perfeito para acompanhar o café!',
       price: 22.00,
       image: 'bolos/mesclado.jpg',
+      stock: null
+    },
+    {
+      id: 15,
+      category: 'docinhos',
+      name: 'Cupcake Red Velvet',
+      desc: 'Delicioso mini bolo red velvet com cobertura cremosa de cream cheese e polvilhado com raspas vermelhas. Um encanto de sabor e visual!',
+      price: 8.50,
+      image: 'https://images.unsplash.com/photo-1614707267537-b85acf00c4b8?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      stock: null
+    },
+    {
+      id: 16,
+      category: 'docinhos',
+      name: 'Caixa de Brigadeiros Gourmet',
+      desc: 'Caixa especial contendo 6 unidades dos nossos brigadeiros gourmet mais pedidos (Belga Tradicional, Ninho com Nutella e Pistache). Feito com chocolate nobre.',
+      price: 15.00,
+      image: 'https://images.unsplash.com/photo-1548907040-4d42b321881a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      stock: null
+    },
+    {
+      id: 17,
+      category: 'docinhos',
+      name: 'Mini Torta Holandesa',
+      desc: 'Torta individual com creme holandês levíssimo de baunilha, base de biscoito Calipso e finalizada com ganache cremosa de chocolate meio amargo.',
+      price: 12.00,
+      image: 'https://images.unsplash.com/photo-1508737804141-4c3b688e2546?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
       stock: null
     }
   ];
@@ -591,7 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!savedProfileBox || !savedProfileText) return;
     
     // Obter perfis
-    const profiles = JSON.parse(localStorage.getItem('padaria_lamim_profiles') || '{}');
+    const profiles = JSON.parse(localStorage.getItem('doce_magia_profiles') || '{}');
     const profile = profiles[phoneValue];
     
     if (profile) {
@@ -616,7 +644,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnUseSavedAddress) {
     btnUseSavedAddress.onclick = () => {
       const phoneValue = inputPhone.value;
-      const profiles = JSON.parse(localStorage.getItem('padaria_lamim_profiles') || '{}');
+      const profiles = JSON.parse(localStorage.getItem('doce_magia_profiles') || '{}');
       const profile = profiles[phoneValue];
       if (profile) {
         deliveryMethod = 'delivery';
@@ -913,7 +941,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Salvar perfil do cliente localmente
       if (phone && name) {
-        const profiles = JSON.parse(localStorage.getItem('padaria_lamim_profiles') || '{}');
+        const profiles = JSON.parse(localStorage.getItem('doce_magia_profiles') || '{}');
         profiles[phone] = {
           name: name,
           street: deliveryMethod === 'delivery' ? inputAddressStreet.value.trim() : '',
@@ -921,7 +949,7 @@ document.addEventListener('DOMContentLoaded', () => {
           neighborhood: deliveryMethod === 'delivery' ? inputAddressNeighborhood.value.trim() : '',
           complement: deliveryMethod === 'delivery' ? inputAddressComplement.value.trim() : ''
         };
-        localStorage.setItem('padaria_lamim_profiles', JSON.stringify(profiles));
+        localStorage.setItem('doce_magia_profiles', JSON.stringify(profiles));
       }
 
       // Atualizar estoques físicos de produtos no Supabase (se houver estoque limitado)
@@ -938,7 +966,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Salvar pedido no localStorage e iniciar rastreamento
-      localStorage.setItem('padaria_lamim_active_order_id', data[0].id);
+      localStorage.setItem('doce_magia_active_order_id', data[0].id);
       startTracking(data[0].id);
 
       // Render Success elements
@@ -1062,7 +1090,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnTrackingDismiss) {
     btnTrackingDismiss.onclick = () => {
       // Clear tracking
-      localStorage.removeItem('padaria_lamim_active_order_id');
+      localStorage.removeItem('doce_magia_active_order_id');
       if (trackingFloatingBar) {
         trackingFloatingBar.classList.remove('active');
         trackingFloatingBar.classList.add('hidden');
@@ -1416,7 +1444,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
  
   function initOrderTracking() {
-    const activeOrderId = localStorage.getItem('padaria_lamim_active_order_id');
+    const activeOrderId = localStorage.getItem('doce_magia_active_order_id');
     if (activeOrderId) {
       console.log("Rastreando pedido ativo encontrado no localStorage:", activeOrderId);
       startTracking(activeOrderId);

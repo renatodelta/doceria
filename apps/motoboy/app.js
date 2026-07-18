@@ -1,5 +1,5 @@
 /* ==========================================================================
-   PADARIA LAMIM - Motoboy App Logic (Tailwind & LocalStorage Sync)
+   DOCE MAGIA - Motoboy App Logic (Tailwind & LocalStorage Sync)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
       return url;
     }
-    if (window.location.hostname.endsWith('padarialamim.com')) {
-      return 'https://padarialamim.com/' + url;
+    if (window.location.hostname.endsWith('padarialamim.com') || window.location.hostname.endsWith('docemagia.com')) {
+      return 'https://docemagia.com/' + url;
     }
     return '../cliente/' + url;
   }

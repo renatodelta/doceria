@@ -1,4 +1,4 @@
-const CACHE_NAME = 'padaria-lamim-motoboy-cache-v3';
+const CACHE_NAME = 'doce-magia-motoboy-cache-v3';
 const ASSETS = [
   './',
   './index.html',

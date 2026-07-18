@@ -1,7 +1,7 @@
 {
-  "name": "Painel de Atendimento - Padaria Lamim",
-  "short_name": "Painel Lamim",
-  "description": "Painel de atendimento e gestão de pedidos da Padaria Lamim.",
+  "name": "Painel de Atendimento - Doce Magia",
+  "short_name": "Painel Doce Magia",
+  "description": "Painel de atendimento e gestão de pedidos da Doce Magia.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#fefae0",
