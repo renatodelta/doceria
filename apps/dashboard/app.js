@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadProductsData() {
     try {
       const { data, error } = await supabaseClient
-        .from('produtos')
+        .from('doceria')
         .select('*')
         .order('id', { ascending: true });
 
@@ -335,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
           const { data: insertedData, error: insertError } = await supabaseClient
-            .from('produtos')
+            .from('doceria')
             .insert(defaultProducts)
             .select();
 
@@ -1331,13 +1331,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const filePath = `produtos/${fileName}`;
 
         const { data, error: uploadError } = await supabaseClient.storage
-          .from('padaria-lamim')
+          .from('delivery360')
           .upload(filePath, file);
 
         if (uploadError) throw uploadError;
 
         const { data: publicUrlData } = supabaseClient.storage
-          .from('padaria-lamim')
+          .from('delivery360')
           .getPublicUrl(filePath);
 
         image = publicUrlData.publicUrl;
@@ -1347,7 +1347,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (idVal) {
         const { error } = await supabaseClient
-          .from('produtos')
+          .from('doceria')
           .update({
             name,
             category,
@@ -1360,7 +1360,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (error) throw error;
       } else {
         const { error } = await supabaseClient
-          .from('produtos')
+          .from('doceria')
           .insert([{
             name,
             category,
@@ -1395,7 +1395,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (confirm(`Deseja realmente excluir o produto "${prod.name}"?`)) {
       try {
         const { error } = await supabaseClient
-          .from('produtos')
+          .from('doceria')
           .delete()
           .eq('id', productId);
 
@@ -1505,7 +1505,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const { error } = await supabaseClient
-        .from('produtos')
+        .from('doceria')
         .update({ stock: newStock })
         .eq('id', productId);
 
@@ -1523,7 +1523,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const { error } = await supabaseClient
-        .from('produtos')
+        .from('doceria')
         .update({ stock: value })
         .eq('id', productId);
 
@@ -1548,7 +1548,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const { error } = await supabaseClient
-        .from('produtos')
+        .from('doceria')
         .update({ stock: newStock })
         .eq('id', productId);
 

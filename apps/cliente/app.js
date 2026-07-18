@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadProductsFromSupabase() {
     try {
       const { data, error } = await supabaseClient
-        .from('produtos')
+        .from('doceria')
         .select('*')
         .order('id', { ascending: true });
 
@@ -875,7 +875,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 1. Buscar os estoques mais atualizados dos produtos do carrinho
       const productIds = cart.map(item => item.id);
       const { data: currentDbProducts, error: stockFetchError } = await supabaseClient
-        .from('produtos')
+        .from('doceria')
         .select('id, name, stock')
         .in('id', productIds);
 
@@ -959,7 +959,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const currentStock = parseInt(dbProd.stock, 10);
           const newStock = Math.max(0, currentStock - item.qty);
           await supabaseClient
-            .from('produtos')
+            .from('doceria')
             .update({ stock: newStock })
             .eq('id', item.id);
         }
