@@ -357,13 +357,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const imageHtml = prod.image
           ? `<img class="product-image" src="${prod.image}" alt="${prod.name}"/>`
-          : `<div class="w-full h-full flex flex-col items-center justify-center gap-1.5" style="background-color: rgba(139, 115, 102, 0.08); color: var(--text-muted); display: flex; align-items: center; justify-content: center; height: 100%;">
-              <span class="material-symbols-outlined" style="font-size: 32px;">image</span>
+          : `<div class="w-full h-full flex flex-col items-center justify-center gap-1.5" style="background-color: rgba(137, 43, 69, 0.05); color: var(--text-muted); display: flex; align-items: center; justify-content: center; height: 100%;">
+              <span class="material-symbols-outlined" style="font-size: 32px; color: var(--accent);">image</span>
               <span style="font-size: 0.75rem; font-weight: 600; font-family: inherit;">Sem Imagem</span>
              </div>`;
 
+        let badgeHtml = '';
+        if (prod.category === 'docinhos') {
+          badgeHtml = `<span class="product-card-badge badge-gourmet">🧁 Gourmet</span>`;
+        } else if (prod.name.includes('Chocolate') || prod.name.includes('Churros')) {
+          badgeHtml = `<span class="product-card-badge badge-bestseller">🔥 Mais Vendido</span>`;
+        }
+
         productCard.innerHTML = `
           <div class="product-image-container">
+            ${badgeHtml}
             ${imageHtml}
           </div>
           <div class="product-info">
